@@ -16,7 +16,10 @@ import {
   FC,
 } from "react";
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+const ACCENT = "#7DD3FC";
+const ACCENT_BRIGHT = "#38BDF8";
+const BG = "#060608";
+const TEXT = "#F0ECE3";
 
 const IconArrow: FC = () => (
   <svg
@@ -45,7 +48,18 @@ const IconMail: FC = () => (
   </svg>
 );
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const IconTelegram: FC = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+  >
+    <path d="M21.5 3.7 18.3 20c-.2.9-.8 1.1-1.5.7l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5L18 8.1c.3-.3-.1-.5-.5-.2L7.6 14.1l-4.3-1.4c-.9-.3-.9-.9.2-1.3L20.2 3c.8-.3 1.5.2 1.3.7Z" />
+  </svg>
+);
 
 interface SkillItem {
   name: string;
@@ -92,15 +106,16 @@ interface ScrollProgressProps {
   scrollYProgress: MotionValue<number>;
 }
 
-// ─── Text Scramble ─────────────────────────────────────────────────────────────
-
 function useScramble(text: string, trigger: boolean): string {
-  const [display, setDisplay] = useState<string>(text);
+  const [display, setDisplay] = useState(text);
 
   const chars = "!<>-_\\/[]{}—=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   useEffect(() => {
-    if (!trigger) return;
+    if (!trigger) {
+      setDisplay(text);
+      return;
+    }
 
     let frame = 0;
     const totalFrames = 18;
@@ -121,10 +136,11 @@ function useScramble(text: string, trigger: boolean): string {
           .join("")
       );
 
-      frame++;
+      frame += 1;
 
       if (frame > totalFrames) {
         clearInterval(interval);
+        setDisplay(text);
       }
     }, 40);
 
@@ -133,8 +149,6 @@ function useScramble(text: string, trigger: boolean): string {
 
   return display;
 }
-
-// ─── Magnetic Button ──────────────────────────────────────────────────────────
 
 function MagneticBtn({
   children,
@@ -147,16 +161,16 @@ function MagneticBtn({
   const y = useMotionValue(0);
 
   const sx = useSpring(x, {
-    stiffness: 200,
-    damping: 15,
+    stiffness: 220,
+    damping: 16,
   });
 
   const sy = useSpring(y, {
-    stiffness: 200,
-    damping: 15,
+    stiffness: 220,
+    damping: 16,
   });
 
-  const [hov, setHov] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const handleMove = (
     e: React.MouseEvent<HTMLButtonElement>
@@ -166,20 +180,18 @@ function MagneticBtn({
     const rect = ref.current.getBoundingClientRect();
 
     x.set(
-      (e.clientX - rect.left - rect.width / 2) *
-        0.3
+      (e.clientX - rect.left - rect.width / 2) * 0.22
     );
 
     y.set(
-      (e.clientY - rect.top - rect.height / 2) *
-        0.3
+      (e.clientY - rect.top - rect.height / 2) * 0.22
     );
   };
 
   const handleLeave = () => {
     x.set(0);
     y.set(0);
-    setHov(false);
+    setHovered(false);
   };
 
   return (
@@ -189,57 +201,51 @@ function MagneticBtn({
       style={{
         x: sx,
         y: sy,
-        padding: "0.9rem 2.2rem",
+        padding: "0.95rem 2.15rem",
         background: primary
-          ? hov
-            ? "#38BDF8"
-            : "#7DD3FC"
+          ? hovered
+            ? ACCENT_BRIGHT
+            : ACCENT
           : "transparent",
         color: primary
-          ? "#060608"
-          : hov
-          ? "#7DD3FC"
-          : "#f0ece3",
+          ? BG
+          : hovered
+          ? ACCENT
+          : TEXT,
         border: primary
           ? "none"
-          : "1px solid rgba(240,236,227,0.2)",
-        fontFamily: "'Syne', sans-serif",
-        fontWeight: 700,
-        fontSize: "0.85rem",
-        letterSpacing: "0.05em",
+          : "1px solid rgba(240,236,227,0.18)",
+        fontFamily: "'DM Sans', sans-serif",
+        fontWeight: 600,
+        fontSize: "0.82rem",
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
         cursor: "pointer",
-        transition: "background 0.2s, color 0.2s",
+        transition:
+          "background .2s ease, color .2s ease, border-color .2s ease",
       }}
       onMouseMove={handleMove}
-      onMouseEnter={() => setHov(true)}
+      onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleLeave}
-      whileTap={{ scale: 0.96 }}
+      whileTap={{ scale: 0.97 }}
     >
       {children}
     </motion.button>
   );
 }
 
-// ─── Section Label ────────────────────────────────────────────────────────────
-
-function SectionLabel({
-  children,
-}: SectionLabelProps) {
+function SectionLabel({ children }: SectionLabelProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{
-        opacity: 1,
-        x: 0,
-      }}
+      initial={{ opacity: 0, x: -18 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
       style={{
-        fontSize: "0.7rem",
-        letterSpacing: "0.2em",
+        fontSize: "0.68rem",
+        letterSpacing: "0.22em",
         textTransform: "uppercase",
-        color: "#7DD3FC",
+        color: ACCENT,
         fontFamily: "'DM Sans', sans-serif",
-        fontWeight: 500,
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
@@ -249,7 +255,7 @@ function SectionLabel({
         style={{
           width: 30,
           height: 1,
-          background: "#7DD3FC",
+          background: ACCENT,
           display: "inline-block",
         }}
       />
@@ -258,31 +264,20 @@ function SectionLabel({
   );
 }
 
-// ─── Section Title ────────────────────────────────────────────────────────────
-
-function SectionTitle({
-  children,
-}: SectionLabelProps) {
+function SectionTitle({ children }: SectionLabelProps) {
   return (
     <motion.h2
-      initial={{
-        opacity: 0,
-        y: 30,
-      }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-      }}
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: 0.1 }}
       style={{
         fontFamily: "'Syne', sans-serif",
         fontWeight: 800,
-        fontSize:
-          "clamp(2rem, 5vw, 3.5rem)",
-        letterSpacing: "-0.03em",
-        lineHeight: 1.1,
-        marginTop: "0.75rem",
+        fontSize: "clamp(2.2rem, 5vw, 4rem)",
+        letterSpacing: "-0.04em",
+        lineHeight: 1,
+        marginTop: "0.8rem",
       }}
     >
       {children}
@@ -290,41 +285,34 @@ function SectionTitle({
   );
 }
 
-// ─── Skill Card ───────────────────────────────────────────────────────────────
-
 function SkillCard({
   skill,
   index,
 }: SkillCardProps) {
-  const [hov, setHov] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: 30,
-      }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-      }}
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{
         delay: index * 0.08,
+        duration: 0.55,
       }}
-      onHoverStart={() => setHov(true)}
-      onHoverEnd={() => setHov(false)}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
       style={{
         padding: "2rem",
-        background: hov
-          ? "rgba(125,211,252,0.05)"
-          : "rgba(240,236,227,0.02)",
-        border:
-          "1px solid rgba(240,236,227,0.06)",
-        cursor: "default",
-        transition: "background 0.3s",
+        minHeight: 190,
+        background: hovered
+          ? "rgba(125,211,252,0.045)"
+          : "rgba(240,236,227,0.018)",
+        border: "1px solid rgba(240,236,227,0.07)",
         position: "relative",
         overflow: "hidden",
+        transition:
+          "background .3s ease, border-color .3s ease",
       }}
     >
       <div
@@ -332,12 +320,12 @@ function SkillCard({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          marginBottom: "1.5rem",
         }}
       >
         <span
           style={{
             fontSize: "1.8rem",
+            opacity: 0.9,
           }}
         >
           {skill.icon}
@@ -345,15 +333,14 @@ function SkillCard({
 
         <span
           style={{
-            fontSize: "0.65rem",
-            fontFamily: "'DM Sans', sans-serif",
-            color:
-              "rgba(240,236,227,0.3)",
-            letterSpacing: "0.1em",
+            fontSize: "0.62rem",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
+            color:
+              "rgba(240,236,227,0.34)",
             border:
               "1px solid rgba(240,236,227,0.1)",
-            padding: "0.2rem 0.6rem",
+            padding: "0.22rem 0.55rem",
           }}
         >
           {skill.cat}
@@ -362,10 +349,11 @@ function SkillCard({
 
       <div
         style={{
-          fontFamily: "'Syne', sans-serif",
+          marginTop: "2rem",
+          fontFamily:
+            "'Syne', sans-serif",
           fontWeight: 700,
           fontSize: "1.05rem",
-          marginBottom: "1rem",
         }}
       >
         {skill.name}
@@ -373,11 +361,10 @@ function SkillCard({
 
       <div
         style={{
+          marginTop: "1rem",
           height: 2,
           background:
             "rgba(240,236,227,0.08)",
-          borderRadius: 1,
-          overflow: "hidden",
         }}
       >
         <motion.div
@@ -387,14 +374,13 @@ function SkillCard({
           }}
           viewport={{ once: true }}
           transition={{
-            delay:
-              0.3 + index * 0.08,
+            delay: 0.25 + index * 0.08,
             duration: 1,
             ease: "easeOut",
           }}
           style={{
             height: "100%",
-            background: "#7DD3FC",
+            background: ACCENT,
           }}
         />
       </div>
@@ -403,58 +389,35 @@ function SkillCard({
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          marginTop: "0.5rem",
+          marginTop: "0.45rem",
         }}
       >
         <span
           style={{
-            fontSize: "0.75rem",
-            color: "#7DD3FC",
+            color: ACCENT,
             fontFamily:
               "'DM Sans', sans-serif",
-            fontWeight: 500,
+            fontSize: "0.72rem",
           }}
         >
           {skill.level}%
         </span>
       </div>
-
-      {hov && (
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-          }}
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background:
-              "linear-gradient(90deg, transparent, #7DD3FC, transparent)",
-          }}
-        />
-      )}
     </motion.div>
   );
 }
-
-// ─── Project Row ──────────────────────────────────────────────────────────────
 
 function ProjectRow({
   project,
   index,
 }: ProjectRowProps) {
-  const [hov, setHov] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
       initial={{
         opacity: 0,
-        y: 20,
+        y: 18,
       }}
       whileInView={{
         opacity: 1,
@@ -462,32 +425,32 @@ function ProjectRow({
       }}
       viewport={{ once: true }}
       transition={{
-        delay: index * 0.1,
+        delay: index * 0.09,
       }}
-      onHoverStart={() => setHov(true)}
-      onHoverEnd={() => setHov(false)}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
       style={{
         display: "grid",
         gridTemplateColumns:
-          "80px 1fr auto",
+          "70px minmax(0, 1fr) auto",
         alignItems: "center",
         gap: "2rem",
-        padding: "2rem 0",
+        padding: "2rem 1.25rem",
         borderBottom:
-          "1px solid rgba(240,236,227,0.06)",
-        cursor: "pointer",
-        background: hov
-          ? "rgba(240,236,227,0.02)"
+          "1px solid rgba(240,236,227,0.07)",
+        background: hovered
+          ? "rgba(240,236,227,0.018)"
           : "transparent",
-        transition: "background 0.2s",
+        transition:
+          "background .2s ease",
       }}
     >
       <span
         style={{
           fontFamily: "'Syne', sans-serif",
-          fontSize: "0.8rem",
+          fontSize: "0.76rem",
           color:
-            "rgba(240,236,227,0.2)",
+            "rgba(240,236,227,0.22)",
           fontWeight: 700,
         }}
       >
@@ -497,18 +460,21 @@ function ProjectRow({
       <div>
         <motion.h3
           animate={{
-            x: hov ? 6 : 0,
+            x: hovered ? 6 : 0,
           }}
           transition={{
-            duration: 0.2,
+            duration: 0.18,
           }}
           style={{
             fontFamily:
               "'Syne', sans-serif",
             fontWeight: 800,
-            fontSize: "1.4rem",
-            letterSpacing: "-0.02em",
-            marginBottom: "0.4rem",
+            fontSize:
+              "clamp(1.2rem, 2vw, 1.5rem)",
+            letterSpacing:
+              "-0.025em",
+            marginBottom:
+              "0.5rem",
           }}
         >
           {project.title}
@@ -516,12 +482,13 @@ function ProjectRow({
 
         <p
           style={{
+            maxWidth: 680,
             color:
-              "rgba(240,236,227,0.45)",
+              "rgba(240,236,227,0.47)",
             fontFamily:
               "'DM Sans', sans-serif",
             fontSize: "0.9rem",
-            lineHeight: 1.5,
+            lineHeight: 1.55,
           }}
         >
           {project.desc}
@@ -530,25 +497,27 @@ function ProjectRow({
         <div
           style={{
             display: "flex",
-            gap: "0.5rem",
-            marginTop: "0.75rem",
+            gap: "0.45rem",
             flexWrap: "wrap",
+            marginTop: "0.8rem",
           }}
         >
           {project.tags.map((tag) => (
             <span
               key={tag}
               style={{
-                fontSize: "0.65rem",
-                fontFamily:
-                  "'DM Sans', sans-serif",
-                letterSpacing: "0.08em",
-                padding:
-                  "0.25rem 0.75rem",
-                border: `1px solid ${project.accent}50`,
-                color: project.accent,
+                fontSize: "0.61rem",
+                letterSpacing: "0.09em",
                 textTransform:
                   "uppercase",
+                padding:
+                  "0.25rem 0.65rem",
+                border:
+                  `1px solid ${project.accent}45`,
+                color:
+                  project.accent,
+                fontFamily:
+                  "'DM Sans', sans-serif",
               }}
             >
               {tag}
@@ -557,13 +526,13 @@ function ProjectRow({
         </div>
       </div>
 
-      <motion.div
+      <motion.span
         animate={{
-          x: hov ? 0 : 8,
-          opacity: hov ? 1 : 0.3,
+          x: hovered ? 0 : 7,
+          opacity: hovered ? 1 : 0.25,
         }}
         transition={{
-          duration: 0.2,
+          duration: 0.18,
         }}
         style={{
           color: project.accent,
@@ -571,49 +540,49 @@ function ProjectRow({
         }}
       >
         →
-      </motion.div>
+      </motion.span>
     </motion.div>
   );
 }
-
-// ─── Contact Link ─────────────────────────────────────────────────────────────
 
 function ContactLink({
   icon,
   label,
   href,
 }: ContactLinkProps) {
-  const [hov, setHov] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.a
       href={href}
       whileHover={{ y: -3 }}
       onHoverStart={() =>
-        setHov(true)
+        setHovered(true)
       }
       onHoverEnd={() =>
-        setHov(false)
+        setHovered(false)
       }
       style={{
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        gap: "0.6rem",
-        padding: "0.85rem 1.8rem",
-        border: `1px solid ${
-          hov
-            ? "rgba(125,211,252,0.4)"
-            : "rgba(240,236,227,0.15)"
-        }`,
-        color: "#f0ece3",
+        gap: "0.65rem",
+        padding:
+          "0.9rem 1.5rem",
+        border:
+          `1px solid ${
+            hovered
+              ? "rgba(125,211,252,.45)"
+              : "rgba(240,236,227,.14)"
+          }`,
+        color: TEXT,
         textDecoration: "none",
-        fontSize: "0.85rem",
+        fontSize: "0.8rem",
         fontFamily:
           "'DM Sans', sans-serif",
         background:
-          "rgba(240,236,227,0.03)",
+          "rgba(240,236,227,0.025)",
         transition:
-          "border-color 0.2s",
+          "border-color .2s ease",
       }}
     >
       {icon}
@@ -622,8 +591,6 @@ function ContactLink({
   );
 }
 
-// ─── Scroll Progress ──────────────────────────────────────────────────────────
-
 function ScrollProgress({
   scrollYProgress,
 }: ScrollProgressProps) {
@@ -631,11 +598,9 @@ function ScrollProgress({
     <motion.div
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
+        inset: "0 0 auto 0",
         height: 2,
-        background: "#7DD3FC",
+        background: ACCENT,
         scaleX: scrollYProgress,
         transformOrigin: "0%",
         zIndex: 200,
@@ -643,8 +608,6 @@ function ScrollProgress({
     />
   );
 }
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const [isLoaded, setIsLoaded] =
@@ -669,14 +632,14 @@ export default function Home() {
 
   const heroY = useTransform(
     scrollYProgress,
-    [0, 0.4],
-    [0, -120]
+    [0, 0.35],
+    [0, -100]
   );
 
   const heroOpacity =
     useTransform(
       scrollYProgress,
-      [0, 0.3],
+      [0, 0.25],
       [1, 0]
     );
 
@@ -686,11 +649,12 @@ export default function Home() {
   );
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setIsLoaded(true);
-    }, 200);
+    const timer = setTimeout(
+      () => setIsLoaded(true),
+      200
+    );
 
-    const onMove = (
+    const handleMouseMove = (
       e: MouseEvent
     ) => {
       setCursorPos({
@@ -701,14 +665,14 @@ export default function Home() {
 
     window.addEventListener(
       "mousemove",
-      onMove
+      handleMouseMove
     );
 
     return () => {
-      clearTimeout(t);
+      clearTimeout(timer);
       window.removeEventListener(
         "mousemove",
-        onMove
+        handleMouseMove
       );
     };
   }, []);
@@ -752,53 +716,56 @@ export default function Home() {
     },
   ];
 
-  const projects: ProjectItem[] =
-    [
-      {
-        num: "01",
-        title: "Gaming Short",
-        desc: "Short-form gaming concept built around cinematic visuals, fast pacing and social-first storytelling.",
-        tags: [
-          "Short-form",
-          "AI",
-          "Editing",
-        ],
-        accent: "#7DD3FC",
-      },
-      {
-        num: "02",
-        title: "Automotive",
-        desc: "Cinematic automotive campaign concept combining AI-generated visuals and commercial storytelling.",
-        tags: [
-          "AI",
-          "Automotive",
-          "Content",
-        ],
-        accent: "#38BDF8",
-      },
-      {
-        num: "03",
-        title: "Mallord Music",
-        desc: "Visual direction and digital identity for an independent music project.",
-        tags: [
-          "Music",
-          "Visual",
-          "Branding",
-        ],
-        accent: "#A5F3FC",
-      },
-      {
-        num: "04",
-        title: "Digital Object",
-        desc: "Modern portfolio experience focused on visual storytelling, interaction and web design.",
-        tags: [
-          "Web",
-          "Design",
-          "Next.js",
-        ],
-        accent: "#22D3EE",
-      },
-    ];
+  const projects: ProjectItem[] = [
+    {
+      num: "01",
+      title: "Gaming Short",
+      desc:
+        "Short-form gaming concept built around cinematic visuals, fast pacing and social-first storytelling.",
+      tags: [
+        "Short-form",
+        "AI",
+        "Editing",
+      ],
+      accent: "#7DD3FC",
+    },
+    {
+      num: "02",
+      title: "Automotive",
+      desc:
+        "Cinematic automotive campaign concept combining AI-generated visuals and commercial storytelling.",
+      tags: [
+        "AI",
+        "Automotive",
+        "Content",
+      ],
+      accent: "#38BDF8",
+    },
+    {
+      num: "03",
+      title: "Mallord Music",
+      desc:
+        "Visual direction and digital identity for an independent music project.",
+      tags: [
+        "Music",
+        "Visual",
+        "Branding",
+      ],
+      accent: "#A5F3FC",
+    },
+    {
+      num: "04",
+      title: "Digital Object",
+      desc:
+        "Modern portfolio experience focused on visual storytelling, interaction and web design.",
+      tags: [
+        "Web",
+        "Design",
+        "Next.js",
+      ],
+      accent: "#22D3EE",
+    },
+  ];
 
   return (
     <div
@@ -806,19 +773,15 @@ export default function Home() {
       style={{
         fontFamily:
           "'Syne', sans-serif",
-        background: "#060608",
-        color: "#f0ece3",
+        background: BG,
+        color: TEXT,
         minHeight: "100vh",
         overflowX: "hidden",
         position: "relative",
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-
         * {
-          margin: 0;
-          padding: 0;
           box-sizing: border-box;
         }
 
@@ -828,7 +791,12 @@ export default function Home() {
 
         body {
           margin: 0;
-          background: #060608;
+          background: ${BG};
+        }
+
+        ::selection {
+          background: ${ACCENT};
+          color: ${BG};
         }
 
         ::-webkit-scrollbar {
@@ -836,42 +804,69 @@ export default function Home() {
         }
 
         ::-webkit-scrollbar-track {
-          background: #060608;
+          background: ${BG};
         }
 
         ::-webkit-scrollbar-thumb {
-          background: #7DD3FC;
-          border-radius: 2px;
+          background: ${ACCENT};
         }
 
         button,
         a {
           -webkit-tap-highlight-color: transparent;
         }
+
+        @media (max-width: 700px) {
+          nav {
+            padding: 1rem 1.2rem !important;
+          }
+
+          nav .nav-links {
+            gap: 0.9rem !important;
+          }
+
+          nav .nav-links a {
+            font-size: 0.62rem !important;
+          }
+
+          .hero-content {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+          }
+
+          .content-section {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+          }
+
+          .project-row {
+            grid-template-columns: 42px 1fr !important;
+            gap: 0.9rem !important;
+          }
+
+          .project-arrow {
+            display: none !important;
+          }
+        }
       `}</style>
 
-      {/* Cursor Glow */}
+      {/* Cursor glow */}
       <motion.div
         style={{
           position: "fixed",
           top: 0,
           left: 0,
-          width: 400,
-          height: 400,
+          width: 420,
+          height: 420,
           borderRadius: "50%",
           pointerEvents: "none",
           zIndex: 0,
           background:
-            "radial-gradient(circle, rgba(125,211,252,0.07) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(125,211,252,0.065) 0%, transparent 70%)",
           translateX:
-            cursorPos.x - 200,
+            cursorPos.x - 210,
           translateY:
-            cursorPos.y - 200,
-        }}
-        transition={{
-          type: "spring",
-          damping: 30,
-          stiffness: 150,
+            cursorPos.y - 210,
         }}
       />
 
@@ -882,11 +877,10 @@ export default function Home() {
           inset: 0,
           zIndex: 1,
           pointerEvents: "none",
-          opacity: 0.04,
+          opacity: 0.035,
           backgroundImage:
             `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundSize:
-            "150px",
+          backgroundSize: "150px",
         }}
       />
 
@@ -896,10 +890,10 @@ export default function Home() {
         }
       />
 
-      {/* NAV */}
+      {/* Navigation */}
       <motion.nav
         initial={{
-          y: -60,
+          y: -50,
           opacity: 0,
         }}
         animate={
@@ -911,7 +905,7 @@ export default function Home() {
             : {}
         }
         transition={{
-          duration: 0.7,
+          duration: 0.65,
           ease: "easeOut",
         }}
         style={{
@@ -925,139 +919,157 @@ export default function Home() {
             "space-between",
           alignItems: "center",
           padding:
-            "1.5rem 3rem",
+            "1.35rem 3rem",
           borderBottom:
             "1px solid rgba(240,236,227,0.06)",
           backdropFilter:
             "blur(20px)",
           background:
-            "rgba(6,6,8,0.7)",
+            "rgba(6,6,8,0.76)",
         }}
       >
         <motion.a
           href="#home"
+          whileHover={{
+            scale: 1.04,
+          }}
           style={{
             fontFamily:
               "'Syne', sans-serif",
-            fontSize: "1.3rem",
+            fontSize: "1.25rem",
             fontWeight: 800,
             letterSpacing:
-              "-0.02em",
-            color: "#7DD3FC",
+              "-0.03em",
+            color: ACCENT,
             textDecoration:
               "none",
-          }}
-          whileHover={{
-            scale: 1.05,
           }}
         >
           MALLORD
         </motion.a>
 
         <div
+          className="nav-links"
           style={{
             display: "flex",
-            gap: "2.5rem",
+            gap: "2.2rem",
           }}
         >
           {[
             ["Home", "home"],
-            ["Skills", "skills"],
+            ["Services", "skills"],
             ["Projects", "projects"],
             ["Contact", "contact"],
-          ].map(([label, id]) => (
-            <motion.a
-              key={label}
-              href={`#${id}`}
-              style={{
-                color:
-                  "rgba(240,236,227,0.6)",
-                textDecoration:
-                  "none",
-                fontSize: "0.8rem",
-                fontFamily:
-                  "'DM Sans', sans-serif",
-                letterSpacing:
-                  "0.1em",
-                textTransform:
-                  "uppercase",
-                fontWeight: 500,
-              }}
-              whileHover={{
-                color: "#7DD3FC",
-                y: -1,
-              }}
-              transition={{
-                duration: 0.2,
-              }}
-            >
-              {label}
-            </motion.a>
-          ))}
+          ].map(
+            ([label, id]) => (
+              <motion.a
+                key={label}
+                href={`#${id}`}
+                whileHover={{
+                  y: -1,
+                  color: ACCENT,
+                }}
+                transition={{
+                  duration: 0.15,
+                }}
+                style={{
+                  color:
+                    "rgba(240,236,227,0.56)",
+                  textDecoration:
+                    "none",
+                  fontFamily:
+                    "'DM Sans', sans-serif",
+                  fontSize:
+                    "0.74rem",
+                  fontWeight: 500,
+                  letterSpacing:
+                    "0.12em",
+                  textTransform:
+                    "uppercase",
+                }}
+              >
+                {label}
+              </motion.a>
+            )
+          )}
         </div>
       </motion.nav>
 
-      {/* HERO */}
+      {/* Hero */}
       <section
         id="home"
         style={{
-          minHeight: "100vh",
+          minHeight:
+            "100vh",
           display: "flex",
-          alignItems: "center",
-          position: "relative",
-          overflow: "hidden",
+          alignItems:
+            "center",
+          position:
+            "relative",
+          overflow:
+            "hidden",
         }}
       >
         <div
           style={{
-            position: "absolute",
+            position:
+              "absolute",
             inset: 0,
-            zIndex: 0,
+            opacity: 0.45,
             backgroundImage:
-              `linear-gradient(rgba(125,211,252,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,0.04) 1px, transparent 1px)`,
+              `linear-gradient(rgba(125,211,252,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,0.025) 1px, transparent 1px)`,
             backgroundSize:
-              "60px 60px",
+              "70px 70px",
           }}
         />
 
         <motion.div
           style={{
-            position: "absolute",
-            right: "-10%",
-            top: "10%",
-            width: 600,
-            height: 600,
-            borderRadius: "50%",
-            filter: "blur(100px)",
-            zIndex: 0,
+            position:
+              "absolute",
+            right: "-8%",
+            top: "8%",
+            width: 620,
+            height: 620,
+            borderRadius:
+              "50%",
+            filter:
+              "blur(110px)",
             background:
-              "radial-gradient(circle, rgba(125,211,252,0.15) 0%, rgba(56,189,248,0.05) 50%, transparent 70%)",
+              "radial-gradient(circle, rgba(125,211,252,0.12) 0%, rgba(56,189,248,0.035) 45%, transparent 70%)",
           }}
           animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, 0],
+            scale: [
+              1, 1.08, 1,
+            ],
           }}
           transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
+            duration: 9,
+            repeat:
+              Infinity,
+            ease:
+              "easeInOut",
           }}
         />
 
         <motion.div
+          className="hero-content"
           style={{
-            position: "relative",
+            position:
+              "relative",
             zIndex: 2,
-            padding: "0 3rem",
-            paddingTop: "6rem",
+            width: "100%",
+            padding:
+              "7rem 3rem 4rem",
             y: heroY,
-            opacity: heroOpacity,
+            opacity:
+              heroOpacity,
           }}
         >
           <motion.div
             initial={{
               opacity: 0,
-              y: 30,
+              y: 25,
             }}
             animate={
               isLoaded
@@ -1068,26 +1080,26 @@ export default function Home() {
                 : {}
             }
             transition={{
-              delay: 0.4,
-              duration: 0.7,
+              delay: 0.35,
+              duration: 0.65,
             }}
             style={{
-              display: "inline-flex",
-              alignItems: "center",
+              display:
+                "inline-flex",
+              alignItems:
+                "center",
               gap: "0.5rem",
+              padding:
+                "0.38rem 0.85rem",
               border:
                 "1px solid rgba(125,211,252,0.3)",
-              borderRadius: "2px",
-              padding:
-                "0.4rem 1rem",
-              marginBottom:
-                "2rem",
-              color: "#7DD3FC",
-              fontSize: "0.75rem",
-              letterSpacing:
-                "0.15em",
+              color: ACCENT,
               fontFamily:
                 "'DM Sans', sans-serif",
+              fontSize:
+                "0.67rem",
+              letterSpacing:
+                "0.14em",
               textTransform:
                 "uppercase",
             }}
@@ -1095,23 +1107,26 @@ export default function Home() {
             <motion.span
               animate={{
                 opacity: [
-                  1, 0.3, 1,
+                  1, 0.25, 1,
                 ],
               }}
               transition={{
                 duration: 1.5,
-                repeat: Infinity,
+                repeat:
+                  Infinity,
               }}
             >
               ●
             </motion.span>
-
             Available for freelance work
           </motion.div>
 
           <div
             style={{
-              overflow: "hidden",
+              marginTop:
+                "1.8rem",
+              overflow:
+                "hidden",
             }}
           >
             {[
@@ -1134,9 +1149,9 @@ export default function Home() {
                   }
                   transition={{
                     delay:
-                      0.5 +
+                      0.45 +
                       i * 0.12,
-                    duration: 0.8,
+                    duration: 0.78,
                     ease: [
                       0.22,
                       1,
@@ -1145,22 +1160,22 @@ export default function Home() {
                     ],
                   }}
                   style={{
-                    display: "block",
                     fontFamily:
                       "'Syne', sans-serif",
                     fontWeight: 800,
                     fontSize:
-                      "clamp(3rem, 8vw, 7rem)",
-                    lineHeight: 0.95,
+                      "clamp(3.2rem, 8.5vw, 8rem)",
+                    lineHeight:
+                      0.9,
                     letterSpacing:
-                      "-0.03em",
+                      "-0.05em",
                     color:
                       i === 2
                         ? "transparent"
-                        : "#f0ece3",
+                        : TEXT,
                     WebkitTextStroke:
                       i === 2
-                        ? "1px #7DD3FC"
+                        ? `1px ${ACCENT}`
                         : "none",
                   }}
                 >
@@ -1170,7 +1185,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Scramble subtitle */}
           <motion.div
             initial={{
               opacity: 0,
@@ -1183,7 +1197,7 @@ export default function Home() {
                 : {}
             }
             transition={{
-              delay: 1,
+              delay: 0.95,
             }}
             onHoverStart={() =>
               setHeroHovered(true)
@@ -1193,16 +1207,15 @@ export default function Home() {
             }
             style={{
               marginTop:
-                "1.5rem",
-              fontSize:
-                "0.85rem",
-              letterSpacing:
-                "0.25em",
+                "1.35rem",
               color:
                 "rgba(240,236,227,0.3)",
               fontFamily:
                 "'DM Sans', sans-serif",
-              cursor: "default",
+              fontSize:
+                "0.77rem",
+              letterSpacing:
+                "0.27em",
             }}
           >
             {scrambled}
@@ -1222,34 +1235,34 @@ export default function Home() {
                 : {}
             }
             transition={{
-              delay: 1.1,
-              duration: 0.7,
+              delay: 1.02,
+              duration: 0.65,
             }}
             style={{
+              maxWidth: 560,
               marginTop:
-                "1.5rem",
-              maxWidth: 520,
+                "1.3rem",
               color:
                 "rgba(240,236,227,0.5)",
-              fontSize:
-                "1rem",
               fontFamily:
                 "'DM Sans', sans-serif",
+              fontSize:
+                "1rem",
               fontWeight: 300,
-              lineHeight: 1.7,
+              lineHeight:
+                1.7,
             }}
           >
             Creating bold digital
-            experiences through
-            AI, design, short-form
+            experiences through AI,
+            design, short-form
             content and modern web.
           </motion.p>
 
-          {/* Buttons */}
           <motion.div
             initial={{
               opacity: 0,
-              y: 20,
+              y: 18,
             }}
             animate={
               isLoaded
@@ -1260,15 +1273,16 @@ export default function Home() {
                 : {}
             }
             transition={{
-              delay: 1.2,
-              duration: 0.6,
+              delay: 1.15,
+              duration: 0.55,
             }}
             style={{
               display: "flex",
-              gap: "1rem",
+              gap: "0.9rem",
               marginTop:
-                "3rem",
-              flexWrap: "wrap",
+                "2.5rem",
+              flexWrap:
+                "wrap",
             }}
           >
             <MagneticBtn
@@ -1303,7 +1317,6 @@ export default function Home() {
             </MagneticBtn>
           </motion.div>
 
-          {/* Services */}
           <motion.div
             initial={{
               opacity: 0,
@@ -1316,14 +1329,15 @@ export default function Home() {
                 : {}
             }
             transition={{
-              delay: 1.5,
+              delay: 1.4,
             }}
             style={{
               display: "flex",
-              gap: "3rem",
+              gap: "3.5rem",
               marginTop:
-                "4rem",
-              flexWrap: "wrap",
+                "3.5rem",
+              flexWrap:
+                "wrap",
             }}
           >
             {[
@@ -1332,35 +1346,33 @@ export default function Home() {
               ["03", "Short-form"],
             ].map(
               ([num, label]) => (
-                <div
-                  key={label}
-                >
+                <div key={label}>
                   <div
                     style={{
                       fontFamily:
                         "'Syne', sans-serif",
-                      fontWeight: 800,
                       fontSize:
-                        "2rem",
-                      color:
-                        "#7DD3FC",
+                        "1.65rem",
+                      fontWeight: 800,
+                      color: ACCENT,
                     }}
                   >
                     {num}
                   </div>
-
                   <div
                     style={{
-                      fontSize:
-                        "0.75rem",
-                      color:
-                        "rgba(240,236,227,0.4)",
+                      marginTop:
+                        "0.15rem",
                       fontFamily:
                         "'DM Sans', sans-serif",
+                      fontSize:
+                        "0.67rem",
                       letterSpacing:
-                        "0.08em",
+                        "0.1em",
                       textTransform:
                         "uppercase",
+                      color:
+                        "rgba(240,236,227,0.34)",
                     }}
                   >
                     {label}
@@ -1371,7 +1383,6 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{
             opacity: 0,
@@ -1384,58 +1395,60 @@ export default function Home() {
               : {}
           }
           transition={{
-            delay: 2,
+            delay: 1.8,
           }}
           style={{
             position:
               "absolute",
-            bottom: "2rem",
-            left: "3rem",
-            display: "flex",
+            bottom:
+              "1.8rem",
+            left:
+              "3rem",
+            display:
+              "flex",
             alignItems:
               "center",
-            gap: "0.75rem",
+            gap:
+              "0.65rem",
+            color:
+              "rgba(240,236,227,0.25)",
+            fontFamily:
+              "'DM Sans', sans-serif",
+            fontSize:
+              "0.65rem",
+            letterSpacing:
+              "0.14em",
+            textTransform:
+              "uppercase",
           }}
         >
           <motion.div
             animate={{
-              y: [0, 6, 0],
+              y: [0, 5, 0],
             }}
             transition={{
               duration: 1.5,
-              repeat: Infinity,
+              repeat:
+                Infinity,
             }}
           >
             <IconArrow />
           </motion.div>
-
-          <span
-            style={{
-              fontSize:
-                "0.7rem",
-              letterSpacing:
-                "0.15em",
-              textTransform:
-                "uppercase",
-              color:
-                "rgba(240,236,227,0.3)",
-              fontFamily:
-                "'DM Sans', sans-serif",
-            }}
-          >
-            Scroll to explore
-          </span>
+          Scroll to explore
         </motion.div>
       </section>
 
-      {/* SERVICES */}
+      {/* Services */}
       <section
         id="skills"
+        className="content-section"
         style={{
-          minHeight: "100vh",
+          minHeight:
+            "100vh",
           padding:
             "8rem 3rem",
-          position: "relative",
+          position:
+            "relative",
         }}
       >
         <SectionLabel>
@@ -1450,13 +1463,13 @@ export default function Home() {
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fill, minmax(280px, 1fr))",
+              "repeat(auto-fit, minmax(260px, 1fr))",
             gap: "1px",
             marginTop:
-              "4rem",
+              "3.5rem",
+            maxWidth: 1100,
             border:
-              "1px solid rgba(240,236,227,0.08)",
-            maxWidth: 1000,
+              "1px solid rgba(240,236,227,0.07)",
           }}
         >
           {skills.map(
@@ -1473,7 +1486,7 @@ export default function Home() {
         <motion.div
           initial={{
             opacity: 0,
-            y: 30,
+            y: 20,
           }}
           whileInView={{
             opacity: 1,
@@ -1482,15 +1495,12 @@ export default function Home() {
           viewport={{
             once: true,
           }}
-          transition={{
-            delay: 0.3,
-          }}
           style={{
-            marginTop:
-              "4rem",
             display: "flex",
-            gap: "1.5rem",
+            gap: "0.65rem",
             flexWrap: "wrap",
+            marginTop:
+              "3rem",
           }}
         >
           {[
@@ -1504,45 +1514,37 @@ export default function Home() {
             "Photoshop",
           ].map(
             (tool) => (
-              <motion.span
+              <span
                 key={tool}
-                whileHover={{
-                  y: -3,
-                  color: "#7DD3FC",
-                }}
                 style={{
                   padding:
-                    "0.5rem 1.2rem",
+                    "0.48rem 0.95rem",
                   border:
                     "1px solid rgba(240,236,227,0.1)",
-                  fontSize:
-                    "0.8rem",
                   fontFamily:
                     "'DM Sans', sans-serif",
+                  fontSize:
+                    "0.7rem",
+                  color:
+                    "rgba(240,236,227,0.42)",
                   letterSpacing:
                     "0.05em",
-                  color:
-                    "rgba(240,236,227,0.5)",
-                  cursor:
-                    "default",
-                  transition:
-                    "all 0.2s",
                 }}
               >
                 {tool}
-              </motion.span>
+              </span>
             )
           )}
         </motion.div>
       </section>
 
-      {/* PROJECTS */}
+      {/* Projects */}
       <section
         id="projects"
+        className="content-section"
         style={{
           padding:
             "8rem 3rem",
-          position: "relative",
         }}
       >
         <SectionLabel>
@@ -1555,17 +1557,19 @@ export default function Home() {
 
         <div
           style={{
-            display: "grid",
-            gap: "1px",
             marginTop:
-              "4rem",
+              "3.5rem",
           }}
         >
           {projects.map(
             (project, i) => (
               <ProjectRow
-                key={project.num}
-                project={project}
+                key={
+                  project.num
+                }
+                project={
+                  project
+                }
                 index={i}
               />
             )
@@ -1573,13 +1577,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CONTACT */}
+      {/* Contact */}
       <section
         id="contact"
+        className="content-section"
         style={{
           padding:
-            "8rem 3rem 6rem",
-          position: "relative",
+            "8rem 3rem 5rem",
+          position:
+            "relative",
           overflow:
             "hidden",
         }}
@@ -1588,18 +1594,18 @@ export default function Home() {
           style={{
             position:
               "absolute",
-            top: "50%",
-            left: "50%",
+            left: "55%",
+            top: "55%",
             transform:
-              "translate(-50%,-50%)",
-            width: 500,
-            height: 500,
+              "translate(-50%, -50%)",
+            width: 520,
+            height: 520,
             borderRadius:
               "50%",
             filter:
               "blur(120px)",
             background:
-              "radial-gradient(circle, rgba(125,211,252,0.12) 0%, transparent 70%)",
+              "radial-gradient(circle, rgba(125,211,252,0.11), transparent 70%)",
             pointerEvents:
               "none",
           }}
@@ -1612,7 +1618,7 @@ export default function Home() {
         <motion.h2
           initial={{
             opacity: 0,
-            y: 40,
+            y: 30,
           }}
           whileInView={{
             opacity: 1,
@@ -1622,25 +1628,26 @@ export default function Home() {
             once: true,
           }}
           style={{
-            fontFamily:
-              "'Syne', sans-serif",
-            fontWeight: 800,
-            fontSize:
-              "clamp(2.5rem, 6vw, 5rem)",
-            lineHeight: 1,
-            letterSpacing:
-              "-0.03em",
-            maxWidth: 700,
+            maxWidth:
+              760,
             marginTop:
               "1rem",
+            fontFamily:
+              "'Syne', sans-serif",
+            fontSize:
+              "clamp(2.7rem, 6vw, 5.5rem)",
+            fontWeight: 800,
+            letterSpacing:
+              "-0.05em",
+            lineHeight:
+              0.98,
           }}
         >
           Let&apos;s build
           something{" "}
           <span
             style={{
-              color:
-                "#7DD3FC",
+              color: ACCENT,
             }}
           >
             extraordinary
@@ -1660,31 +1667,33 @@ export default function Home() {
             once: true,
           }}
           transition={{
-            delay: 0.2,
+            delay: 0.15,
           }}
           style={{
+            maxWidth:
+              520,
             marginTop:
-              "1.5rem",
+              "1.4rem",
             color:
-              "rgba(240,236,227,0.5)",
+              "rgba(240,236,227,0.46)",
             fontFamily:
               "'DM Sans', sans-serif",
-            fontSize: "1rem",
-            maxWidth: 480,
-            lineHeight: 1.7,
+            fontSize:
+              "1rem",
+            lineHeight:
+              1.7,
           }}
         >
           Have a project in
           mind? Send me a
-          message and
-          let&apos;s talk about
-          it.
+          message and let&apos;s
+          talk.
         </motion.p>
 
         <motion.div
           initial={{
             opacity: 0,
-            y: 30,
+            y: 20,
           }}
           whileInView={{
             opacity: 1,
@@ -1694,27 +1703,28 @@ export default function Home() {
             once: true,
           }}
           transition={{
-            delay: 0.3,
+            delay: 0.25,
           }}
           style={{
             display: "flex",
-            gap: "1rem",
+            gap: "0.8rem",
+            flexWrap:
+              "wrap",
             marginTop:
-              "3rem",
-            flexWrap: "wrap",
+              "2.5rem",
           }}
         >
           <ContactLink
-            icon={<IconMail />}
+            icon={
+              <IconMail />
+            }
             label="Email"
             href="mailto:stuffmallord@gmail.com"
           />
 
           <ContactLink
             icon={
-              <span>
-                ✈
-              </span>
+              <IconTelegram />
             }
             label="Telegram"
             href="https://t.me/shaahdm"
@@ -1726,42 +1736,30 @@ export default function Home() {
             marginTop:
               "6rem",
             paddingTop:
-              "2rem",
+              "1.8rem",
             borderTop:
               "1px solid rgba(240,236,227,0.06)",
             display: "flex",
             justifyContent:
               "space-between",
-            alignItems:
-              "center",
+            gap: "1rem",
             flexWrap:
               "wrap",
-            gap: "1rem",
+            fontFamily:
+              "'DM Sans', sans-serif",
+            fontSize:
+              "0.68rem",
+            color:
+              "rgba(240,236,227,0.2)",
+            letterSpacing:
+              "0.04em",
           }}
         >
-          <span
-            style={{
-              color:
-                "rgba(240,236,227,0.2)",
-              fontSize:
-                "0.75rem",
-              fontFamily:
-                "'DM Sans', sans-serif",
-            }}
-          >
+          <span>
             © 2026 MALLORD
           </span>
 
-          <span
-            style={{
-              color:
-                "rgba(240,236,227,0.2)",
-              fontSize:
-                "0.75rem",
-              fontFamily:
-                "'DM Sans', sans-serif",
-            }}
-          >
+          <span>
             Creative / Digital /
             AI
           </span>

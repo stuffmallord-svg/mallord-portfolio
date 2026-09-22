@@ -1,44 +1,35 @@
 import type { Metadata } from "next";
-import { Syne } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-});
-
 export const metadata: Metadata = {
-  title: "Creative Portfolio | Full Stack Developer & Designer",
+  title: "MALLORD — Creative Studio",
   description:
-    "Cinematic, scroll-driven developer portfolio built with Next.js, Framer Motion & TypeScript. Showcasing full stack projects, animations, and UI/UX work.",
+    "MALLORD — creative studio focused on AI content, short-form video, web design and digital experiences.",
   keywords: [
-    "Full Stack Developer",
-    "Next.js Portfolio",
-    "React Developer",
-    "Framer Motion",
-    "TypeScript",
-    "Web Developer Lahore",
-    "The Coding Hub",
+    "MALLORD",
+    "Creative Studio",
+    "AI Content",
+    "Short-form Video",
+    "Web Design",
+    "Digital Experiences",
   ],
-  authors: [{ name: "Saad", url: "https://creative-portfolio.vercel.app" }],
-  creator: "The Coding Hub by Saad & Team",
+  authors: [
+    {
+      name: "MALLORD",
+    },
+  ],
+  creator: "MALLORD",
+
   openGraph: {
-    title: "Creative Portfolio | Full Stack Developer & Designer",
+    title: "MALLORD — Creative Studio",
     description:
-      "Cinematic portfolio with magnetic buttons, text scramble, parallax scroll & animated skill bars.",
-    url: "https://creative-portfolio.vercel.app",
-    siteName: "Creative Portfolio",
+      "AI content, short-form video, web design and digital experiences.",
+    url: "https://mallord-portfolio.vercel.app",
+    siteName: "MALLORD",
     locale: "en_US",
     type: "website",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Creative Portfolio | Full Stack Developer",
-    description:
-      "Built with Next.js 16, Framer Motion & TypeScript. Smooth animations, dark theme, zero icon libraries.",
-    creator: "@saad",
-  },
+
   robots: {
     index: true,
     follow: true,
@@ -52,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${syne.variable} antialiased`}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
