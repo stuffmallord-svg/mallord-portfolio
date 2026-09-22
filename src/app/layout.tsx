@@ -13,11 +13,7 @@ export const metadata: Metadata = {
     "Web Design",
     "Digital Experiences",
   ],
-  authors: [
-    {
-      name: "MALLORD",
-    },
-  ],
+  authors: [{ name: "MALLORD" }],
   creator: "MALLORD",
 
   openGraph: {
