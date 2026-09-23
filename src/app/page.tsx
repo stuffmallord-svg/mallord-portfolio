@@ -2,24 +2,32 @@
 
 import {
   motion,
-  useScroll,
-  useTransform,
   useMotionValue,
+  useScroll,
   useSpring,
+  useTransform,
   MotionValue,
 } from "framer-motion";
 import {
+  FC,
+  ReactNode,
+  useEffect,
   useRef,
   useState,
-  useEffect,
-  ReactNode,
-  FC,
 } from "react";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Theme
+// ─────────────────────────────────────────────────────────────────────────────
 
 const ACCENT = "#7DD3FC";
 const ACCENT_BRIGHT = "#38BDF8";
 const BG = "#060608";
 const TEXT = "#F0ECE3";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Icons
+// ─────────────────────────────────────────────────────────────────────────────
 
 const IconArrow: FC = () => (
   <svg
@@ -41,7 +49,7 @@ const IconMail: FC = () => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.8"
   >
     <rect x="2" y="4" width="20" height="16" rx="2" />
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
@@ -57,9 +65,23 @@ const IconTelegram: FC = () => (
     stroke="currentColor"
     strokeWidth="1.8"
   >
-    <path d="M21.5 3.7 18.3 20c-.2.9-.8 1.1-1.5.7l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5L18 8.1c.3-.3-.1-.5-.5-.2L7.6 14.1l-4.3-1.4c-.9-.3-.9-.9.2-1.3L20.2 3c.8-.3 1.5.2 1.3.7Z" />
+    <path d="M21.5 3.7 18.3 20c-.2.9-.8 1.1-1.5.7l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5L18 8.1c.3-.3-.1-.5-.5-.2L7.6 14.1l-4.3-1.4-0.9-.3c-.9-.3-.9-.9.2-1.3L20.2 3c.8-.3 1.5.2 1.3.7Z" />
   </svg>
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface BtnProps {
+  children: ReactNode;
+  primary?: boolean;
+  onClick?: () => void;
+}
+
+interface SectionLabelProps {
+  children: ReactNode;
+}
 
 interface SkillItem {
   name: string;
@@ -74,16 +96,8 @@ interface ProjectItem {
   desc: string;
   tags: string[];
   accent: string;
-}
-
-interface BtnProps {
-  children: ReactNode;
-  primary?: boolean;
-  onClick?: () => void;
-}
-
-interface SectionLabelProps {
-  children: ReactNode;
+  image: string;
+  slug: string;
 }
 
 interface SkillCardProps {
@@ -106,10 +120,19 @@ interface ScrollProgressProps {
   scrollYProgress: MotionValue<number>;
 }
 
-function useScramble(text: string, trigger: boolean): string {
-  const [display, setDisplay] = useState(text);
+// ─────────────────────────────────────────────────────────────────────────────
+// Text scramble
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const chars = "!<>-_\\/[]{}—=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function useScramble(
+  text: string,
+  trigger: boolean
+): string {
+  const [display, setDisplay] =
+    useState<string>(text);
+
+  const chars =
+    "!<>-_\\/[]{}—=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   useEffect(() => {
     if (!trigger) {
@@ -125,13 +148,23 @@ function useScramble(text: string, trigger: boolean): string {
         text
           .split("")
           .map((char, i) => {
-            if (char === " ") return " ";
+            if (char === " ") {
+              return " ";
+            }
 
-            if (frame / totalFrames > i / text.length) {
+            if (
+              frame / totalFrames >
+              i / text.length
+            ) {
               return char;
             }
 
-            return chars[Math.floor(Math.random() * chars.length)];
+            return chars[
+              Math.floor(
+                Math.random() *
+                  chars.length
+              )
+            ];
           })
           .join("")
       );
@@ -144,18 +177,25 @@ function useScramble(text: string, trigger: boolean): string {
       }
     }, 40);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [trigger, text]);
 
   return display;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Magnetic button
+// ─────────────────────────────────────────────────────────────────────────────
 
 function MagneticBtn({
   children,
   primary,
   onClick,
 }: BtnProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref =
+    useRef<HTMLButtonElement>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -170,21 +210,31 @@ function MagneticBtn({
     damping: 16,
   });
 
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] =
+    useState(false);
 
   const handleMove = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (!ref.current) return;
+    if (!ref.current) {
+      return;
+    }
 
-    const rect = ref.current.getBoundingClientRect();
+    const rect =
+      ref.current.getBoundingClientRect();
 
     x.set(
-      (e.clientX - rect.left - rect.width / 2) * 0.22
+      (e.clientX -
+        rect.left -
+        rect.width / 2) *
+        0.22
     );
 
     y.set(
-      (e.clientY - rect.top - rect.height / 2) * 0.22
+      (e.clientY -
+        rect.top -
+        rect.height / 2) *
+        0.22
     );
   };
 
@@ -201,7 +251,8 @@ function MagneticBtn({
       style={{
         x: sx,
         y: sy,
-        padding: "0.95rem 2.15rem",
+        padding:
+          "0.95rem 2.15rem",
         background: primary
           ? hovered
             ? ACCENT_BRIGHT
@@ -215,37 +266,60 @@ function MagneticBtn({
         border: primary
           ? "none"
           : "1px solid rgba(240,236,227,0.18)",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily:
+          "'DM Sans', sans-serif",
         fontWeight: 600,
         fontSize: "0.82rem",
         letterSpacing: "0.08em",
-        textTransform: "uppercase",
+        textTransform:
+          "uppercase",
         cursor: "pointer",
         transition:
           "background .2s ease, color .2s ease, border-color .2s ease",
       }}
       onMouseMove={handleMove}
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() =>
+        setHovered(true)
+      }
       onMouseLeave={handleLeave}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{
+        scale: 0.97,
+      }}
     >
       {children}
     </motion.button>
   );
 }
 
-function SectionLabel({ children }: SectionLabelProps) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Section label
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SectionLabel({
+  children,
+}: SectionLabelProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -18 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
+      initial={{
+        opacity: 0,
+        x: -18,
+      }}
+      whileInView={{
+        opacity: 1,
+        x: 0,
+      }}
+      viewport={{
+        once: true,
+      }}
       style={{
         fontSize: "0.68rem",
         letterSpacing: "0.22em",
-        textTransform: "uppercase",
+        textTransform:
+          "uppercase",
         color: ACCENT,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily:
+          "'DM Sans', sans-serif",
+        fontWeight: 500,
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
@@ -256,7 +330,8 @@ function SectionLabel({ children }: SectionLabelProps) {
           width: 30,
           height: 1,
           background: ACCENT,
-          display: "inline-block",
+          display:
+            "inline-block",
         }}
       />
       {children}
@@ -264,18 +339,37 @@ function SectionLabel({ children }: SectionLabelProps) {
   );
 }
 
-function SectionTitle({ children }: SectionLabelProps) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Section title
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SectionTitle({
+  children,
+}: SectionLabelProps) {
   return (
     <motion.h2
-      initial={{ opacity: 0, y: 25 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: 0.1 }}
+      initial={{
+        opacity: 0,
+        y: 25,
+      }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+      }}
+      viewport={{
+        once: true,
+      }}
+      transition={{
+        delay: 0.1,
+      }}
       style={{
-        fontFamily: "'Syne', sans-serif",
+        fontFamily:
+          "'Syne', sans-serif",
         fontWeight: 800,
-        fontSize: "clamp(2.2rem, 5vw, 4rem)",
-        letterSpacing: "-0.04em",
+        fontSize:
+          "clamp(2.2rem, 5vw, 4rem)",
+        letterSpacing:
+          "-0.04em",
         lineHeight: 1,
         marginTop: "0.8rem",
       }}
@@ -285,32 +379,52 @@ function SectionTitle({ children }: SectionLabelProps) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Skill card
+// ─────────────────────────────────────────────────────────────────────────────
+
 function SkillCard({
   skill,
   index,
 }: SkillCardProps) {
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] =
+    useState(false);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 25 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      initial={{
+        opacity: 0,
+        y: 25,
+      }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+      }}
+      viewport={{
+        once: true,
+      }}
       transition={{
         delay: index * 0.08,
         duration: 0.55,
       }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      onHoverStart={() =>
+        setHovered(true)
+      }
+      onHoverEnd={() =>
+        setHovered(false)
+      }
       style={{
         padding: "2rem",
         minHeight: 190,
         background: hovered
           ? "rgba(125,211,252,0.045)"
           : "rgba(240,236,227,0.018)",
-        border: "1px solid rgba(240,236,227,0.07)",
-        position: "relative",
-        overflow: "hidden",
+        border:
+          "1px solid rgba(240,236,227,0.07)",
+        position:
+          "relative",
+        overflow:
+          "hidden",
         transition:
           "background .3s ease, border-color .3s ease",
       }}
@@ -318,14 +432,15 @@ function SkillCard({
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          justifyContent:
+            "space-between",
+          alignItems:
+            "flex-start",
         }}
       >
         <span
           style={{
             fontSize: "1.8rem",
-            opacity: 0.9,
           }}
         >
           {skill.icon}
@@ -334,13 +449,18 @@ function SkillCard({
         <span
           style={{
             fontSize: "0.62rem",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
+            fontFamily:
+              "'DM Sans', sans-serif",
             color:
               "rgba(240,236,227,0.34)",
+            letterSpacing:
+              "0.12em",
+            textTransform:
+              "uppercase",
             border:
               "1px solid rgba(240,236,227,0.1)",
-            padding: "0.22rem 0.55rem",
+            padding:
+              "0.22rem 0.55rem",
           }}
         >
           {skill.cat}
@@ -368,13 +488,19 @@ function SkillCard({
         }}
       >
         <motion.div
-          initial={{ width: 0 }}
+          initial={{
+            width: 0,
+          }}
           whileInView={{
             width: `${skill.level}%`,
           }}
-          viewport={{ once: true }}
+          viewport={{
+            once: true,
+          }}
           transition={{
-            delay: 0.25 + index * 0.08,
+            delay:
+              0.25 +
+              index * 0.08,
             duration: 1,
             ease: "easeOut",
           }}
@@ -388,7 +514,8 @@ function SkillCard({
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent:
+            "flex-end",
           marginTop: "0.45rem",
         }}
       >
@@ -397,7 +524,8 @@ function SkillCard({
             color: ACCENT,
             fontFamily:
               "'DM Sans', sans-serif",
-            fontSize: "0.72rem",
+            fontSize:
+              "0.72rem",
           }}
         >
           {skill.level}%
@@ -407,35 +535,50 @@ function SkillCard({
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Project row
+// ─────────────────────────────────────────────────────────────────────────────
+
 function ProjectRow({
   project,
   index,
 }: ProjectRowProps) {
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] =
+    useState(false);
 
   return (
-    <motion.div
+    <motion.a
+      href={`/projects/${project.slug}`}
       initial={{
         opacity: 0,
-        y: 18,
+        y: 20,
       }}
       whileInView={{
         opacity: 1,
         y: 0,
       }}
-      viewport={{ once: true }}
-      transition={{
-        delay: index * 0.09,
+      viewport={{
+        once: true,
       }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      transition={{
+        delay: index * 0.08,
+        duration: 0.55,
+      }}
+      onHoverStart={() =>
+        setHovered(true)
+      }
+      onHoverEnd={() =>
+        setHovered(false)
+      }
+      className="project-row"
       style={{
         display: "grid",
         gridTemplateColumns:
-          "70px minmax(0, 1fr) auto",
+          "70px 190px minmax(0, 1fr) 30px",
         alignItems: "center",
-        gap: "2rem",
-        padding: "2rem 1.25rem",
+        gap: "1.5rem",
+        padding:
+          "1.25rem 0",
         borderBottom:
           "1px solid rgba(240,236,227,0.07)",
         background: hovered
@@ -443,11 +586,18 @@ function ProjectRow({
           : "transparent",
         transition:
           "background .2s ease",
+        textDecoration:
+          "none",
+        color:
+          "inherit",
+        cursor:
+          "pointer",
       }}
     >
       <span
         style={{
-          fontFamily: "'Syne', sans-serif",
+          fontFamily:
+            "'Syne', sans-serif",
           fontSize: "0.76rem",
           color:
             "rgba(240,236,227,0.22)",
@@ -457,7 +607,43 @@ function ProjectRow({
         {project.num}
       </span>
 
-      <div>
+      <div
+        className="project-image"
+        style={{
+          width: "190px",
+          height: "120px",
+          overflow: "hidden",
+          border:
+            "1px solid rgba(240,236,227,0.08)",
+          background: "#0A0A0D",
+        }}
+      >
+        <img
+          src={project.image}
+          alt={project.title}
+          loading="lazy"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            opacity:
+              hovered ? 1 : 0.72,
+            transform:
+              hovered
+                ? "scale(1.05)"
+                : "scale(1)",
+            transition:
+              "opacity .35s ease, transform .45s ease",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          minWidth: 0,
+        }}
+      >
         <motion.h3
           animate={{
             x: hovered ? 6 : 0,
@@ -482,12 +668,12 @@ function ProjectRow({
 
         <p
           style={{
-            maxWidth: 680,
+            maxWidth: 720,
             color:
               "rgba(240,236,227,0.47)",
             fontFamily:
               "'DM Sans', sans-serif",
-            fontSize: "0.9rem",
+            fontSize: "0.88rem",
             lineHeight: 1.55,
           }}
         >
@@ -499,63 +685,82 @@ function ProjectRow({
             display: "flex",
             gap: "0.45rem",
             flexWrap: "wrap",
-            marginTop: "0.8rem",
+            marginTop:
+              "0.8rem",
           }}
         >
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                fontSize: "0.61rem",
-                letterSpacing: "0.09em",
-                textTransform:
-                  "uppercase",
-                padding:
-                  "0.25rem 0.65rem",
-                border:
-                  `1px solid ${project.accent}45`,
-                color:
-                  project.accent,
-                fontFamily:
-                  "'DM Sans', sans-serif",
-              }}
-            >
-              {tag}
-            </span>
-          ))}
+          {project.tags.map(
+            (tag) => (
+              <span
+                key={
+                  tag
+                }
+                style={{
+                  fontSize:
+                    "0.61rem",
+                  letterSpacing:
+                    "0.09em",
+                  textTransform:
+                    "uppercase",
+                  padding:
+                    "0.25rem 0.65rem",
+                  border:
+                    `1px solid ${project.accent}45`,
+                  color:
+                    project.accent,
+                  fontFamily:
+                    "'DM Sans', sans-serif",
+                }}
+              >
+                {tag}
+              </span>
+            )
+          )}
         </div>
       </div>
 
       <motion.span
+        className="project-arrow"
         animate={{
-          x: hovered ? 0 : 7,
-          opacity: hovered ? 1 : 0.25,
+          x: hovered ? 0 : 6,
+          opacity: hovered
+            ? 1
+            : 0.25,
         }}
         transition={{
           duration: 0.18,
         }}
         style={{
-          color: project.accent,
-          fontSize: "1.5rem",
+          color:
+            project.accent,
+          fontSize:
+            "1.5rem",
         }}
       >
         →
       </motion.span>
-    </motion.div>
+    </motion.a>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contact link
+// ─────────────────────────────────────────────────────────────────────────────
 
 function ContactLink({
   icon,
   label,
   href,
 }: ContactLinkProps) {
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] =
+    useState(false);
 
   return (
     <motion.a
       href={href}
-      whileHover={{ y: -3 }}
+      whileHover={{
+        y: -3,
+      }}
       onHoverStart={() =>
         setHovered(true)
       }
@@ -563,8 +768,10 @@ function ContactLink({
         setHovered(false)
       }
       style={{
-        display: "inline-flex",
-        alignItems: "center",
+        display:
+          "inline-flex",
+        alignItems:
+          "center",
         gap: "0.65rem",
         padding:
           "0.9rem 1.5rem",
@@ -575,7 +782,8 @@ function ContactLink({
               : "rgba(240,236,227,.14)"
           }`,
         color: TEXT,
-        textDecoration: "none",
+        textDecoration:
+          "none",
         fontSize: "0.8rem",
         fontFamily:
           "'DM Sans', sans-serif",
@@ -591,6 +799,10 @@ function ContactLink({
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Scroll progress
+// ─────────────────────────────────────────────────────────────────────────────
+
 function ScrollProgress({
   scrollYProgress,
 }: ScrollProgressProps) {
@@ -598,16 +810,23 @@ function ScrollProgress({
     <motion.div
       style={{
         position: "fixed",
-        inset: "0 0 auto 0",
+        inset:
+          "0 0 auto 0",
         height: 2,
         background: ACCENT,
-        scaleX: scrollYProgress,
-        transformOrigin: "0%",
+        scaleX:
+          scrollYProgress,
+        transformOrigin:
+          "0%",
         zIndex: 200,
       }}
     />
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main page
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const [isLoaded, setIsLoaded] =
@@ -627,14 +846,16 @@ export default function Home() {
 
   const { scrollYProgress } =
     useScroll({
-      target: containerRef,
+      target:
+        containerRef,
     });
 
-  const heroY = useTransform(
-    scrollYProgress,
-    [0, 0.35],
-    [0, -100]
-  );
+  const heroY =
+    useTransform(
+      scrollYProgress,
+      [0, 0.35],
+      [0, -100]
+    );
 
   const heroOpacity =
     useTransform(
@@ -643,25 +864,25 @@ export default function Home() {
       [1, 0]
     );
 
-  const scrambled = useScramble(
-    "CREATIVE / DIGITAL / AI",
-    heroHovered
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(
-      () => setIsLoaded(true),
-      200
+  const scrambled =
+    useScramble(
+      "CREATIVE / DIGITAL / AI",
+      heroHovered
     );
 
-    const handleMouseMove = (
-      e: MouseEvent
-    ) => {
-      setCursorPos({
-        x: e.clientX,
-        y: e.clientY,
-      });
-    };
+  useEffect(() => {
+    const timer =
+      setTimeout(() => {
+        setIsLoaded(true);
+      }, 200);
+
+    const handleMouseMove =
+      (e: MouseEvent) => {
+        setCursorPos({
+          x: e.clientX,
+          y: e.clientY,
+        });
+      };
 
     window.addEventListener(
       "mousemove",
@@ -670,12 +891,17 @@ export default function Home() {
 
     return () => {
       clearTimeout(timer);
+
       window.removeEventListener(
         "mousemove",
         handleMouseMove
       );
     };
   }, []);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Services
+  // ───────────────────────────────────────────────────────────────────────────
 
   const skills: SkillItem[] = [
     {
@@ -716,54 +942,74 @@ export default function Home() {
     },
   ];
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Projects
+  // ───────────────────────────────────────────────────────────────────────────
+
   const projects: ProjectItem[] = [
     {
       num: "01",
-      title: "Gaming Short",
+      title: "AFTERIMAGE",
       desc:
-        "Short-form gaming concept built around cinematic visuals, fast pacing and social-first storytelling.",
+        "A cinematic visual concept exploring motion, light and digital identity.",
       tags: [
-        "Short-form",
-        "AI",
-        "Editing",
+        "Art Direction",
+        "Motion",
+        "Visual",
       ],
       accent: "#7DD3FC",
+      image:
+        "/projects/afterimage.jpg",
+      slug:
+        "afterimage",
     },
     {
       num: "02",
-      title: "Automotive",
+      title: "CONCRETE",
       desc:
-        "Cinematic automotive campaign concept combining AI-generated visuals and commercial storytelling.",
+        "An architectural visual study built around geometry, shadow and atmosphere.",
       tags: [
-        "AI",
-        "Automotive",
-        "Content",
+        "Architecture",
+        "Visual",
+        "Direction",
       ],
       accent: "#38BDF8",
+      image:
+        "/projects/concrete.jpg",
+      slug:
+        "concrete",
     },
     {
       num: "03",
-      title: "Mallord Music",
+      title: "DEEP BLUE",
       desc:
-        "Visual direction and digital identity for an independent music project.",
+        "An experimental digital concept combining abstract forms, light and AI-driven aesthetics.",
       tags: [
-        "Music",
-        "Visual",
-        "Branding",
+        "AI",
+        "Digital Art",
+        "Concept",
       ],
       accent: "#A5F3FC",
+      image:
+        "/projects/deep-blue.jpg",
+      slug:
+        "deep-blue",
     },
     {
       num: "04",
-      title: "Digital Object",
+      title: "GLASS OBJECT",
       desc:
-        "Modern portfolio experience focused on visual storytelling, interaction and web design.",
+        "A minimal product concept focused on material, transparency and futuristic visual language.",
       tags: [
-        "Web",
-        "Design",
-        "Next.js",
+        "3D",
+        "Product",
+        "Visual",
       ],
       accent: "#22D3EE",
+      image:
+        "/projects/glass-object.jpg",
+      slug:
+        "glass-object",
     },
   ];
 
@@ -775,11 +1021,15 @@ export default function Home() {
           "'Syne', sans-serif",
         background: BG,
         color: TEXT,
-        minHeight: "100vh",
-        overflowX: "hidden",
-        position: "relative",
+        minHeight:
+          "100vh",
+        overflowX:
+          "hidden",
+        position:
+          "relative",
       }}
     >
+      {/* ── Global styles ── */}
       <style>{`
         * {
           box-sizing: border-box;
@@ -816,17 +1066,14 @@ export default function Home() {
           -webkit-tap-highlight-color: transparent;
         }
 
-        @media (max-width: 700px) {
-          nav {
-            padding: 1rem 1.2rem !important;
-          }
-
-          nav .nav-links {
+        @media (max-width: 800px) {
+          .desktop-nav-links {
             gap: 0.9rem !important;
           }
 
-          nav .nav-links a {
-            font-size: 0.62rem !important;
+          .desktop-nav-links a {
+            font-size: 0.61rem !important;
+            letter-spacing: 0.07em !important;
           }
 
           .hero-content {
@@ -840,17 +1087,57 @@ export default function Home() {
           }
 
           .project-row {
-            grid-template-columns: 42px 1fr !important;
+            grid-template-columns: 42px minmax(0, 1fr) !important;
             gap: 0.9rem !important;
+            padding: 1.1rem 0 !important;
+          }
+
+          .project-image {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            width: 100% !important;
+            height: 190px !important;
+            order: 1;
+          }
+
+          .project-row > div:nth-of-type(2) {
+            grid-column: 2 !important;
+            grid-row: 2 !important;
           }
 
           .project-arrow {
             display: none !important;
           }
         }
+
+        @media (max-width: 520px) {
+          .desktop-nav-links a:nth-child(2) {
+            display: none !important;
+          }
+
+          .hero-title {
+            font-size: clamp(3rem, 15vw, 5rem) !important;
+          }
+
+          .hero-buttons {
+            width: 100%;
+          }
+
+          .hero-buttons button {
+            width: 100%;
+          }
+
+          .services-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .contact-section {
+            padding-top: 6rem !important;
+          }
+        }
       `}</style>
 
-      {/* Cursor glow */}
+      {/* ── Cursor glow ── */}
       <motion.div
         style={{
           position: "fixed",
@@ -858,11 +1145,13 @@ export default function Home() {
           left: 0,
           width: 420,
           height: 420,
-          borderRadius: "50%",
-          pointerEvents: "none",
+          borderRadius:
+            "50%",
+          pointerEvents:
+            "none",
           zIndex: 0,
           background:
-            "radial-gradient(circle, rgba(125,211,252,0.065) 0%, transparent 70%)",
+            `radial-gradient(circle, rgba(125,211,252,0.065) 0%, transparent 70%)`,
           translateX:
             cursorPos.x - 210,
           translateY:
@@ -870,17 +1159,19 @@ export default function Home() {
         }}
       />
 
-      {/* Noise */}
+      {/* ── Noise ── */}
       <div
         style={{
           position: "fixed",
           inset: 0,
           zIndex: 1,
-          pointerEvents: "none",
+          pointerEvents:
+            "none",
           opacity: 0.035,
           backgroundImage:
             `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundSize: "150px",
+          backgroundSize:
+            "150px",
         }}
       />
 
@@ -890,7 +1181,7 @@ export default function Home() {
         }
       />
 
-      {/* Navigation */}
+      {/* ── Navigation ── */}
       <motion.nav
         initial={{
           y: -50,
@@ -917,7 +1208,8 @@ export default function Home() {
           display: "flex",
           justifyContent:
             "space-between",
-          alignItems: "center",
+          alignItems:
+            "center",
           padding:
             "1.35rem 3rem",
           borderBottom:
@@ -936,23 +1228,27 @@ export default function Home() {
           style={{
             fontFamily:
               "'Syne', sans-serif",
-            fontSize: "1.25rem",
+            fontSize:
+              "1.25rem",
             fontWeight: 800,
             letterSpacing:
               "-0.03em",
             color: ACCENT,
             textDecoration:
               "none",
+            flexShrink: 0,
           }}
         >
           MALLORD
         </motion.a>
 
         <div
-          className="nav-links"
+          className="desktop-nav-links"
           style={{
             display: "flex",
             gap: "2.2rem",
+            alignItems:
+              "center",
           }}
         >
           {[
@@ -995,7 +1291,7 @@ export default function Home() {
         </div>
       </motion.nav>
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section
         id="home"
         style={{
@@ -1040,7 +1336,9 @@ export default function Home() {
           }}
           animate={{
             scale: [
-              1, 1.08, 1,
+              1,
+              1.08,
+              1,
             ],
           }}
           transition={{
@@ -1088,7 +1386,8 @@ export default function Home() {
                 "inline-flex",
               alignItems:
                 "center",
-              gap: "0.5rem",
+              gap:
+                "0.5rem",
               padding:
                 "0.38rem 0.85rem",
               border:
@@ -1107,7 +1406,9 @@ export default function Home() {
             <motion.span
               animate={{
                 opacity: [
-                  1, 0.25, 1,
+                  1,
+                  0.25,
+                  1,
                 ],
               }}
               transition={{
@@ -1150,8 +1451,10 @@ export default function Home() {
                   transition={{
                     delay:
                       0.45 +
-                      i * 0.12,
-                    duration: 0.78,
+                      i *
+                        0.12,
+                    duration:
+                      0.78,
                     ease: [
                       0.22,
                       1,
@@ -1159,6 +1462,7 @@ export default function Home() {
                       1,
                     ],
                   }}
+                  className="hero-title"
                   style={{
                     fontFamily:
                       "'Syne', sans-serif",
@@ -1239,7 +1543,8 @@ export default function Home() {
               duration: 0.65,
             }}
             style={{
-              maxWidth: 560,
+              maxWidth:
+                560,
               marginTop:
                 "1.3rem",
               color:
@@ -1276,6 +1581,7 @@ export default function Home() {
               delay: 1.15,
               duration: 0.55,
             }}
+            className="hero-buttons"
             style={{
               display: "flex",
               gap: "0.9rem",
@@ -1332,8 +1638,10 @@ export default function Home() {
               delay: 1.4,
             }}
             style={{
-              display: "flex",
-              gap: "3.5rem",
+              display:
+                "flex",
+              gap:
+                "3.5rem",
               marginTop:
                 "3.5rem",
               flexWrap:
@@ -1346,19 +1654,26 @@ export default function Home() {
               ["03", "Short-form"],
             ].map(
               ([num, label]) => (
-                <div key={label}>
+                <div
+                  key={
+                    label
+                  }
+                >
                   <div
                     style={{
                       fontFamily:
                         "'Syne', sans-serif",
                       fontSize:
                         "1.65rem",
-                      fontWeight: 800,
-                      color: ACCENT,
+                      fontWeight:
+                        800,
+                      color:
+                        ACCENT,
                     }}
                   >
                     {num}
                   </div>
+
                   <div
                     style={{
                       marginTop:
@@ -1383,6 +1698,7 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
+        {/* Scroll indicator */}
         <motion.div
           initial={{
             opacity: 0,
@@ -1424,7 +1740,11 @@ export default function Home() {
         >
           <motion.div
             animate={{
-              y: [0, 5, 0],
+              y: [
+                0,
+                5,
+                0,
+              ],
             }}
             transition={{
               duration: 1.5,
@@ -1434,11 +1754,12 @@ export default function Home() {
           >
             <IconArrow />
           </motion.div>
+
           Scroll to explore
         </motion.div>
       </section>
 
-      {/* Services */}
+      {/* ── Services ── */}
       <section
         id="skills"
         className="content-section"
@@ -1460,14 +1781,17 @@ export default function Home() {
         </SectionTitle>
 
         <div
+          className="services-grid"
           style={{
             display: "grid",
             gridTemplateColumns:
               "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "1px",
+            gap:
+              "1px",
             marginTop:
               "3.5rem",
-            maxWidth: 1100,
+            maxWidth:
+              1100,
             border:
               "1px solid rgba(240,236,227,0.07)",
           }}
@@ -1475,9 +1799,15 @@ export default function Home() {
           {skills.map(
             (skill, i) => (
               <SkillCard
-                key={skill.name}
-                skill={skill}
-                index={i}
+                key={
+                  skill.name
+                }
+                skill={
+                  skill
+                }
+                index={
+                  i
+                }
               />
             )
           )}
@@ -1496,9 +1826,12 @@ export default function Home() {
             once: true,
           }}
           style={{
-            display: "flex",
-            gap: "0.65rem",
-            flexWrap: "wrap",
+            display:
+              "flex",
+            gap:
+              "0.65rem",
+            flexWrap:
+              "wrap",
             marginTop:
               "3rem",
           }}
@@ -1515,7 +1848,9 @@ export default function Home() {
           ].map(
             (tool) => (
               <span
-                key={tool}
+                key={
+                  tool
+                }
                 style={{
                   padding:
                     "0.48rem 0.95rem",
@@ -1538,13 +1873,15 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Projects */}
+      {/* ── Projects ── */}
       <section
         id="projects"
         className="content-section"
         style={{
           padding:
             "8rem 3rem",
+          position:
+            "relative",
         }}
       >
         <SectionLabel>
@@ -1565,22 +1902,24 @@ export default function Home() {
             (project, i) => (
               <ProjectRow
                 key={
-                  project.num
+                  project.slug
                 }
                 project={
                   project
                 }
-                index={i}
+                index={
+                  i
+                }
               />
             )
           )}
         </div>
       </section>
 
-      {/* Contact */}
+      {/* ── Contact ── */}
       <section
         id="contact"
-        className="content-section"
+        className="content-section contact-section"
         style={{
           padding:
             "8rem 3rem 5rem",
@@ -1647,7 +1986,8 @@ export default function Home() {
           something{" "}
           <span
             style={{
-              color: ACCENT,
+              color:
+                ACCENT,
             }}
           >
             extraordinary
@@ -1667,7 +2007,8 @@ export default function Home() {
             once: true,
           }}
           transition={{
-            delay: 0.15,
+            delay:
+              0.15,
           }}
           style={{
             maxWidth:
@@ -1703,11 +2044,14 @@ export default function Home() {
             once: true,
           }}
           transition={{
-            delay: 0.25,
+            delay:
+              0.25,
           }}
           style={{
-            display: "flex",
-            gap: "0.8rem",
+            display:
+              "flex",
+            gap:
+              "0.8rem",
             flexWrap:
               "wrap",
             marginTop:
@@ -1739,12 +2083,16 @@ export default function Home() {
               "1.8rem",
             borderTop:
               "1px solid rgba(240,236,227,0.06)",
-            display: "flex",
+            display:
+              "flex",
             justifyContent:
               "space-between",
-            gap: "1rem",
+            alignItems:
+              "center",
             flexWrap:
               "wrap",
+            gap:
+              "1rem",
             fontFamily:
               "'DM Sans', sans-serif",
             fontSize:
@@ -1760,7 +2108,8 @@ export default function Home() {
           </span>
 
           <span>
-            Creative / Digital /
+            Creative /
+            Digital /
             AI
           </span>
         </div>
