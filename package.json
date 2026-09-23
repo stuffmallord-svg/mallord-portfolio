@@ -1,7 +1,8 @@
 {
-  "name": "animated-components",
-  "version": "0.1.0",
+  "name": "mallord-portfolio",
+  "version": "1.0.0",
   "private": true,
+  "description": "MALLORD — independent creative portfolio for digital experiences, AI visuals, short-form content and web design.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
