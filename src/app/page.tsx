@@ -42,20 +42,6 @@ const IconArrow: FC = () => (
   </svg>
 );
 
-const IconRight: FC = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-  >
-    <path d="M5 12h13" />
-    <path d="m13 6 6 6-6 6" />
-  </svg>
-);
-
 const IconMail: FC = () => (
   <svg
     width="20"
@@ -65,7 +51,13 @@ const IconMail: FC = () => (
     stroke="currentColor"
     strokeWidth="1.8"
   >
-    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <rect
+      x="2"
+      y="4"
+      width="20"
+      height="16"
+      rx="2"
+    />
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 );
@@ -733,7 +725,9 @@ function ProjectRow({
           {project.tags.map(
             (tag) => (
               <span
-                key={tag}
+                key={
+                  tag
+                }
                 style={{
                   fontSize:
                     "0.61rem",
@@ -1171,28 +1165,76 @@ export default function Home() {
           animation-play-state: paused;
         }
 
+        .about-card {
+          transition:
+            background .25s ease,
+            border-color .25s ease,
+            transform .25s ease;
+        }
+
+        .about-card:hover {
+          transform: translateY(-3px);
+          background:
+            rgba(125,211,252,0.018) !important;
+          border-color:
+            rgba(125,211,252,0.18) !important;
+        }
+
+        .about-link {
+          transition:
+            color .2s ease,
+            border-color .2s ease;
+        }
+
+        .about-link:hover {
+          color: ${ACCENT} !important;
+          border-color:
+            rgba(125,211,252,0.3) !important;
+        }
+
+        @media (max-width: 1000px) {
+          .about-intro {
+            grid-template-columns:
+              1fr !important;
+            gap:
+              2.5rem !important;
+          }
+
+          .about-process {
+            grid-template-columns:
+              1fr 1fr !important;
+          }
+        }
+
         @media (max-width: 800px) {
           .desktop-nav-links {
             gap: 0.9rem !important;
           }
 
           .desktop-nav-links a {
-            font-size: 0.61rem !important;
-            letter-spacing: 0.07em !important;
+            font-size:
+              0.61rem !important;
+            letter-spacing:
+              0.07em !important;
           }
 
           .desktop-location {
-            display: none !important;
+            display:
+              none !important;
           }
 
           .hero-content {
-            padding-left: 1.25rem !important;
-            padding-right: 1.25rem !important;
+            padding-left:
+              1.25rem !important;
+            padding-right:
+              1.25rem !important;
           }
 
           .content-section {
-            padding-left: 1.25rem !important;
-            padding-right: 1.25rem !important;
+            padding-left:
+              1.25rem !important;
+            padding-right:
+              1.25rem !important;
           }
 
           .hero-title {
@@ -1237,6 +1279,16 @@ export default function Home() {
               1.8rem !important;
           }
 
+          .about-process {
+            grid-template-columns:
+              1fr !important;
+          }
+
+          .about-card {
+            border-right:
+              none !important;
+          }
+
           .contact-inner {
             grid-template-columns:
               1fr !important;
@@ -1245,9 +1297,10 @@ export default function Home() {
           }
         }
 
-        @media (max-width: 520px) {
+        @media (max-width: 600px) {
           .desktop-nav-links a:nth-child(2) {
-            display: none !important;
+            display:
+              none !important;
           }
 
           .hero-buttons {
@@ -1389,7 +1442,7 @@ export default function Home() {
           className="desktop-nav-links"
           style={{
             display: "flex",
-            gap: "2.2rem",
+            gap: "2rem",
             alignItems:
               "center",
           }}
@@ -1397,6 +1450,7 @@ export default function Home() {
           {[
             ["Home", "home"],
             ["Services", "skills"],
+            ["About", "about"],
             ["Projects", "projects"],
             ["Contact", "contact"],
           ].map(
@@ -1413,10 +1467,10 @@ export default function Home() {
                   fontFamily:
                     "'DM Sans', sans-serif",
                   fontSize:
-                    "0.74rem",
+                    "0.71rem",
                   fontWeight: 500,
                   letterSpacing:
-                    "0.12em",
+                    "0.1em",
                   textTransform:
                     "uppercase",
                 }}
@@ -1795,8 +1849,6 @@ export default function Home() {
             </MagneticBtn>
           </motion.div>
 
-          {/* Stats */}
-
           <motion.div
             initial={{
               opacity: 0,
@@ -1961,7 +2013,7 @@ export default function Home() {
                 "DIGITAL EXPERIENCES",
                 "VISUAL SYSTEMS",
               ].map(
-                (item, index) => (
+                (item) => (
                   <span
                     key={`${groupIndex}-${item}`}
                     style={{
@@ -2144,6 +2196,326 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* ── About ── */}
+
+      <section
+        id="about"
+        className="content-section"
+        style={{
+          padding:
+            "7rem 3rem 9rem",
+          position:
+            "relative",
+          borderTop:
+            "1px solid rgba(240,236,227,0.06)",
+        }}
+      >
+        <SectionLabel>
+          03 / About
+        </SectionLabel>
+
+        <div
+          className="about-intro"
+          style={{
+            display:
+              "grid",
+            gridTemplateColumns:
+              "1.15fr 0.85fr",
+            gap:
+              "5rem",
+            marginTop:
+              "2rem",
+            alignItems:
+              "end",
+          }}
+        >
+          <div>
+            <motion.h2
+              initial={{
+                opacity: 0,
+                y: 25,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              style={{
+                margin: 0,
+                fontFamily:
+                  "'Syne', sans-serif",
+                fontSize:
+                  "clamp(2.8rem, 6.5vw, 6.5rem)",
+                lineHeight:
+                  0.92,
+                letterSpacing:
+                  "-0.065em",
+                fontWeight:
+                  800,
+              }}
+            >
+              IDEAS
+              <br />
+              INTO
+              <br />
+              <span
+                style={{
+                  color:
+                    ACCENT,
+                }}
+              >
+                SOMETHING REAL.
+              </span>
+            </motion.h2>
+          </div>
+
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+            }}
+            transition={{
+              delay: 0.12,
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                color:
+                  "rgba(240,236,227,0.58)",
+                fontFamily:
+                  "'DM Sans', sans-serif",
+                fontSize:
+                  "1rem",
+                lineHeight:
+                  1.8,
+              }}
+            >
+              MALLORD is an independent
+              creative practice focused on
+              AI-assisted visuals, short-form
+              content, web experiences and
+              creative direction.
+            </p>
+
+            <p
+              style={{
+                margin:
+                  "1.2rem 0 0",
+                color:
+                  "rgba(240,236,227,0.4)",
+                fontFamily:
+                  "'DM Sans', sans-serif",
+                fontSize:
+                  "0.9rem",
+                lineHeight:
+                  1.8,
+              }}
+            >
+              I like taking rough ideas and
+              turning them into clear visual
+              systems — from the first concept
+              and references to the final
+              digital piece.
+            </p>
+
+            <a
+              href="#contact"
+              className="about-link"
+              style={{
+                display:
+                  "inline-block",
+                marginTop:
+                  "1.8rem",
+                paddingBottom:
+                  "0.4rem",
+                borderBottom:
+                  "1px solid rgba(125,211,252,0.2)",
+                color:
+                  "rgba(240,236,227,0.55)",
+                textDecoration:
+                  "none",
+                fontFamily:
+                  "'DM Sans', sans-serif",
+                fontSize:
+                  "0.7rem",
+                letterSpacing:
+                  "0.11em",
+                textTransform:
+                  "uppercase",
+              }}
+            >
+              Start a conversation →
+            </a>
+          </motion.div>
+        </div>
+
+        {/* Process */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+          }}
+          className="about-process"
+          style={{
+            display:
+              "grid",
+            gridTemplateColumns:
+              "repeat(3, 1fr)",
+            gap:
+              "1px",
+            marginTop:
+              "6rem",
+            border:
+              "1px solid rgba(240,236,227,0.07)",
+          }}
+        >
+          {[
+            {
+              num: "01",
+              title: "DIRECTION",
+              text:
+                "Define the idea, mood, references and visual language before making the final piece.",
+            },
+            {
+              num: "02",
+              title: "BUILD",
+              text:
+                "Develop the visuals, edit the content or build the digital experience around the concept.",
+            },
+            {
+              num: "03",
+              title: "REFINE",
+              text:
+                "Polish the details, motion, typography and interactions until everything feels intentional.",
+            },
+          ].map(
+            (item) => (
+              <div
+                key={
+                  item.num
+                }
+                className="about-card"
+                style={{
+                  padding:
+                    "2rem",
+                  minHeight:
+                    220,
+                  background:
+                    "rgba(240,236,227,0.012)",
+                  borderRight:
+                    "1px solid rgba(240,236,227,0.07)",
+                }}
+              >
+                <div
+                  style={{
+                    color:
+                      ACCENT,
+                    fontFamily:
+                      "'DM Sans', sans-serif",
+                    fontSize:
+                      "0.63rem",
+                    letterSpacing:
+                      "0.1em",
+                  }}
+                >
+                  {item.num}
+                </div>
+
+                <h3
+                  style={{
+                    margin:
+                      "3.5rem 0 0.8rem",
+                    fontFamily:
+                      "'Syne', sans-serif",
+                    fontSize:
+                      "1.25rem",
+                    fontWeight:
+                      800,
+                    letterSpacing:
+                      "-0.025em",
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    margin: 0,
+                    color:
+                      "rgba(240,236,227,0.38)",
+                    fontFamily:
+                      "'DM Sans', sans-serif",
+                    fontSize:
+                      "0.8rem",
+                    lineHeight:
+                      1.65,
+                  }}
+                >
+                  {item.text}
+                </p>
+              </div>
+            )
+          )}
+        </motion.div>
+
+        <div
+          style={{
+            display:
+              "flex",
+            justifyContent:
+              "space-between",
+            alignItems:
+              "center",
+            gap:
+              "1rem",
+            flexWrap:
+              "wrap",
+            marginTop:
+              "2.5rem",
+            paddingTop:
+              "1rem",
+            borderTop:
+              "1px solid rgba(240,236,227,0.06)",
+            color:
+              "rgba(240,236,227,0.22)",
+            fontFamily:
+              "'DM Sans', sans-serif",
+            fontSize:
+              "0.62rem",
+            letterSpacing:
+              "0.1em",
+            textTransform:
+              "uppercase",
+          }}
+        >
+          <span>
+            Independent / Remote / Freelance
+          </span>
+
+          <span>
+            Creative + Digital + AI
+          </span>
+        </div>
+      </section>
+
       {/* ── Projects ── */}
 
       <section
@@ -2172,7 +2544,7 @@ export default function Home() {
         >
           <div>
             <SectionLabel>
-              03 / Work
+              04 / Work
             </SectionLabel>
 
             <SectionTitle>
@@ -2253,13 +2625,13 @@ export default function Home() {
       {/* ── Statement ── */}
 
       <section
+        className="content-section"
         style={{
           padding:
             "6rem 3rem 9rem",
           position:
             "relative",
         }}
-        className="content-section"
       >
         <div
           style={{
@@ -2268,7 +2640,7 @@ export default function Home() {
           }}
         >
           <SectionLabel>
-            04 / Philosophy
+            05 / Philosophy
           </SectionLabel>
 
           <motion.h2
@@ -2354,7 +2726,7 @@ export default function Home() {
         />
 
         <SectionLabel>
-          05 / Contact
+          06 / Contact
         </SectionLabel>
 
         <div
