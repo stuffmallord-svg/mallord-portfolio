@@ -42,6 +42,20 @@ const IconArrow: FC = () => (
   </svg>
 );
 
+const IconRight: FC = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+  >
+    <path d="M5 12h13" />
+    <path d="m13 6 6 6-6 6" />
+  </svg>
+);
+
 const IconMail: FC = () => (
   <svg
     width="20"
@@ -65,7 +79,7 @@ const IconTelegram: FC = () => (
     stroke="currentColor"
     strokeWidth="1.8"
   >
-    <path d="M21.5 3.7 18.3 20c-.2.9-.8 1.1-1.5.7l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5L18 8.1c.3-.3-.1-.5-.5-.2L7.6 14.1l-4.3-1.4-0.9-.3c-.9-.3-.9-.9.2-1.3L20.2 3c.8-.3 1.5.2 1.3.7Z" />
+    <path d="M21.5 3.7 18.3 20c-.2.9-.8 1.1-1.5.7l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5L18 8.1c.3-.3-.1-.5-.5-.2L7.6 14.1l-4.3-1.4c-.9-.3-.9-.9.2-1.3L20.2 3c.8-.3 1.5.2 1.3.7Z" />
   </svg>
 );
 
@@ -85,9 +99,9 @@ interface SectionLabelProps {
 
 interface SkillItem {
   name: string;
-  level: number;
   icon: string;
   cat: string;
+  description: string;
 }
 
 interface ProjectItem {
@@ -415,7 +429,7 @@ function SkillCard({
       }
       style={{
         padding: "2rem",
-        minHeight: 190,
+        minHeight: 235,
         background: hovered
           ? "rgba(125,211,252,0.045)"
           : "rgba(240,236,227,0.018)",
@@ -431,16 +445,39 @@ function SkillCard({
     >
       <div
         style={{
+          position: "absolute",
+          top: "-55px",
+          right: "-55px",
+          width: 150,
+          height: 150,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(125,211,252,0.08), transparent 68%)",
+          opacity: hovered ? 1 : 0,
+          transition:
+            "opacity .35s ease",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
           display: "flex",
           justifyContent:
             "space-between",
           alignItems:
             "flex-start",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <span
           style={{
             fontSize: "1.8rem",
+            opacity:
+              hovered ? 1 : 0.72,
+            transition:
+              "opacity .25s ease",
           }}
         >
           {skill.icon}
@@ -469,68 +506,64 @@ function SkillCard({
 
       <div
         style={{
-          marginTop: "2rem",
+          marginTop: "3rem",
           fontFamily:
             "'Syne', sans-serif",
           fontWeight: 700,
-          fontSize: "1.05rem",
+          fontSize:
+            "clamp(1.2rem, 2vw, 1.4rem)",
+          letterSpacing:
+            "-0.025em",
+          color: hovered
+            ? ACCENT
+            : TEXT,
+          transition:
+            "color .25s ease",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         {skill.name}
       </div>
 
-      <div
+      <p
         style={{
-          marginTop: "1rem",
-          height: 2,
-          background:
-            "rgba(240,236,227,0.08)",
+          margin:
+            "0.85rem 0 0",
+          maxWidth: 420,
+          color:
+            "rgba(240,236,227,0.38)",
+          fontFamily:
+            "'DM Sans', sans-serif",
+          fontSize:
+            "0.82rem",
+          lineHeight:
+            1.6,
+          position:
+            "relative",
+          zIndex: 1,
         }}
       >
-        <motion.div
-          initial={{
-            width: 0,
-          }}
-          whileInView={{
-            width: `${skill.level}%`,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            delay:
-              0.25 +
-              index * 0.08,
-            duration: 1,
-            ease: "easeOut",
-          }}
-          style={{
-            height: "100%",
-            background: ACCENT,
-          }}
-        />
-      </div>
+        {skill.description}
+      </p>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent:
-            "flex-end",
-          marginTop: "0.45rem",
+      <motion.div
+        animate={{
+          width: hovered ? 52 : 24,
         }}
-      >
-        <span
-          style={{
-            color: ACCENT,
-            fontFamily:
-              "'DM Sans', sans-serif",
-            fontSize:
-              "0.72rem",
-          }}
-        >
-          {skill.level}%
-        </span>
-      </div>
+        transition={{
+          duration: 0.25,
+        }}
+        style={{
+          position:
+            "absolute",
+          bottom: "1.8rem",
+          left: "2rem",
+          height: 1,
+          background:
+            ACCENT,
+        }}
+      />
     </motion.div>
   );
 }
@@ -559,6 +592,7 @@ function ProjectRow({
       }}
       viewport={{
         once: true,
+        amount: 0.2,
       }}
       transition={{
         delay: index * 0.08,
@@ -574,24 +608,26 @@ function ProjectRow({
       style={{
         display: "grid",
         gridTemplateColumns:
-          "70px 190px minmax(0, 1fr) 30px",
+          "70px 190px minmax(0,1fr) 30px",
         alignItems: "center",
         gap: "1.5rem",
         padding:
-          "1.25rem 0",
+          "1.4rem 0",
         borderBottom:
           "1px solid rgba(240,236,227,0.07)",
         background: hovered
-          ? "rgba(240,236,227,0.018)"
+          ? "rgba(125,211,252,0.018)"
           : "transparent",
         transition:
-          "background .2s ease",
+          "background .25s ease",
         textDecoration:
           "none",
         color:
           "inherit",
         cursor:
           "pointer",
+        position:
+          "relative",
       }}
     >
       <span
@@ -600,8 +636,12 @@ function ProjectRow({
             "'Syne', sans-serif",
           fontSize: "0.76rem",
           color:
-            "rgba(240,236,227,0.22)",
+            hovered
+              ? ACCENT
+              : "rgba(240,236,227,0.22)",
           fontWeight: 700,
+          transition:
+            "color .25s ease",
         }}
       >
         {project.num}
@@ -628,13 +668,13 @@ function ProjectRow({
             objectFit: "cover",
             display: "block",
             opacity:
-              hovered ? 1 : 0.72,
+              hovered ? 1 : 0.68,
             transform:
               hovered
-                ? "scale(1.05)"
+                ? "scale(1.055)"
                 : "scale(1)",
             transition:
-              "opacity .35s ease, transform .45s ease",
+              "opacity .35s ease, transform .55s ease",
           }}
         />
       </div>
@@ -646,7 +686,7 @@ function ProjectRow({
       >
         <motion.h3
           animate={{
-            x: hovered ? 6 : 0,
+            x: hovered ? 7 : 0,
           }}
           transition={{
             duration: 0.18,
@@ -659,8 +699,8 @@ function ProjectRow({
               "clamp(1.2rem, 2vw, 1.5rem)",
             letterSpacing:
               "-0.025em",
-            marginBottom:
-              "0.5rem",
+            margin:
+              "0 0 0.5rem",
           }}
         >
           {project.title}
@@ -675,6 +715,7 @@ function ProjectRow({
               "'DM Sans', sans-serif",
             fontSize: "0.88rem",
             lineHeight: 1.55,
+            margin: 0,
           }}
         >
           {project.desc}
@@ -692,9 +733,7 @@ function ProjectRow({
           {project.tags.map(
             (tag) => (
               <span
-                key={
-                  tag
-                }
+                key={tag}
                 style={{
                   fontSize:
                     "0.61rem",
@@ -723,9 +762,8 @@ function ProjectRow({
         className="project-arrow"
         animate={{
           x: hovered ? 0 : 6,
-          opacity: hovered
-            ? 1
-            : 0.25,
+          opacity:
+            hovered ? 1 : 0.25,
         }}
         transition={{
           duration: 0.18,
@@ -772,7 +810,8 @@ function ContactLink({
           "inline-flex",
         alignItems:
           "center",
-        gap: "0.65rem",
+        gap:
+          "0.65rem",
         padding:
           "0.9rem 1.5rem",
         border:
@@ -784,7 +823,8 @@ function ContactLink({
         color: TEXT,
         textDecoration:
           "none",
-        fontSize: "0.8rem",
+        fontSize:
+          "0.8rem",
         fontFamily:
           "'DM Sans', sans-serif",
         background:
@@ -906,39 +946,45 @@ export default function Home() {
   const skills: SkillItem[] = [
     {
       name: "Short-form Content",
-      level: 85,
       icon: "🎬",
       cat: "Content",
+      description:
+        "TikTok, Reels and Shorts with hooks, pacing and platform-first editing.",
     },
     {
       name: "AI Visuals",
-      level: 85,
       icon: "✦",
       cat: "AI",
+      description:
+        "Generative visuals, concepts and creative assets for digital brands and campaigns.",
     },
     {
       name: "Web Design",
-      level: 80,
       icon: "◉",
       cat: "Web",
+      description:
+        "Modern landing pages, portfolios and digital experiences with strong visual direction.",
     },
     {
       name: "Video Editing",
-      level: 80,
       icon: "▣",
       cat: "Content",
+      description:
+        "Editing, sound, transitions, typography and visual rhythm for social content.",
     },
     {
       name: "Creative Direction",
-      level: 75,
       icon: "✳",
       cat: "Creative",
+      description:
+        "Turning rough ideas into coherent visual systems, concepts and finished pieces.",
     },
     {
       name: "Next.js / React",
-      level: 65,
       icon: "⌘",
       cat: "Development",
+      description:
+        "Fast, responsive websites with motion, interaction and a polished front-end.",
     },
   ];
 
@@ -1030,6 +1076,7 @@ export default function Home() {
       }}
     >
       {/* ── Global styles ── */}
+
       <style>{`
         * {
           box-sizing: border-box;
@@ -1066,6 +1113,64 @@ export default function Home() {
           -webkit-tap-highlight-color: transparent;
         }
 
+        .nav-link {
+          transition:
+            color .2s ease,
+            opacity .2s ease;
+        }
+
+        .nav-link:hover {
+          color: ${ACCENT} !important;
+        }
+
+        .availability-dot {
+          animation:
+            pulse-dot 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+          0%,
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+
+          50% {
+            opacity: .3;
+            transform: scale(.7);
+          }
+        }
+
+        .marquee {
+          overflow: hidden;
+          white-space: nowrap;
+          border-top:
+            1px solid rgba(240,236,227,0.06);
+          border-bottom:
+            1px solid rgba(240,236,227,0.06);
+        }
+
+        .marquee-track {
+          display: inline-flex;
+          width: max-content;
+          animation:
+            marquee 22s linear infinite;
+        }
+
+        @keyframes marquee {
+          from {
+            transform: translateX(0);
+          }
+
+          to {
+            transform: translateX(-50%);
+          }
+        }
+
+        .marquee:hover .marquee-track {
+          animation-play-state: paused;
+        }
+
         @media (max-width: 800px) {
           .desktop-nav-links {
             gap: 0.9rem !important;
@@ -1074,6 +1179,10 @@ export default function Home() {
           .desktop-nav-links a {
             font-size: 0.61rem !important;
             letter-spacing: 0.07em !important;
+          }
+
+          .desktop-location {
+            display: none !important;
           }
 
           .hero-content {
@@ -1086,27 +1195,53 @@ export default function Home() {
             padding-right: 1.25rem !important;
           }
 
+          .hero-title {
+            font-size:
+              clamp(3rem, 14vw, 6rem) !important;
+          }
+
           .project-row {
-            grid-template-columns: 42px minmax(0, 1fr) !important;
-            gap: 0.9rem !important;
-            padding: 1.1rem 0 !important;
+            grid-template-columns:
+              42px minmax(0,1fr) !important;
+            gap:
+              0.9rem !important;
+            padding:
+              1.1rem 0 !important;
           }
 
           .project-image {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
-            width: 100% !important;
-            height: 190px !important;
-            order: 1;
+            grid-column:
+              2 !important;
+            grid-row:
+              1 !important;
+            width:
+              100% !important;
+            height:
+              190px !important;
           }
 
           .project-row > div:nth-of-type(2) {
-            grid-column: 2 !important;
-            grid-row: 2 !important;
+            grid-column:
+              2 !important;
+            grid-row:
+              2 !important;
           }
 
           .project-arrow {
-            display: none !important;
+            display:
+              none !important;
+          }
+
+          .hero-stats {
+            gap:
+              1.8rem !important;
+          }
+
+          .contact-inner {
+            grid-template-columns:
+              1fr !important;
+            gap:
+              3.5rem !important;
           }
         }
 
@@ -1115,29 +1250,35 @@ export default function Home() {
             display: none !important;
           }
 
-          .hero-title {
-            font-size: clamp(3rem, 15vw, 5rem) !important;
-          }
-
           .hero-buttons {
-            width: 100%;
+            width:
+              100%;
           }
 
           .hero-buttons button {
-            width: 100%;
+            width:
+              100%;
           }
 
           .services-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns:
+              1fr !important;
           }
 
           .contact-section {
-            padding-top: 6rem !important;
+            padding-top:
+              6rem !important;
+          }
+
+          .hero-status {
+            font-size:
+              0.58rem !important;
           }
         }
       `}</style>
 
       {/* ── Cursor glow ── */}
+
       <motion.div
         style={{
           position: "fixed",
@@ -1151,7 +1292,7 @@ export default function Home() {
             "none",
           zIndex: 0,
           background:
-            `radial-gradient(circle, rgba(125,211,252,0.065) 0%, transparent 70%)`,
+            "radial-gradient(circle, rgba(125,211,252,0.06) 0%, transparent 70%)",
           translateX:
             cursorPos.x - 210,
           translateY:
@@ -1160,6 +1301,7 @@ export default function Home() {
       />
 
       {/* ── Noise ── */}
+
       <div
         style={{
           position: "fixed",
@@ -1182,6 +1324,7 @@ export default function Home() {
       />
 
       {/* ── Navigation ── */}
+
       <motion.nav
         initial={{
           y: -50,
@@ -1258,16 +1401,10 @@ export default function Home() {
             ["Contact", "contact"],
           ].map(
             ([label, id]) => (
-              <motion.a
+              <a
                 key={label}
                 href={`#${id}`}
-                whileHover={{
-                  y: -1,
-                  color: ACCENT,
-                }}
-                transition={{
-                  duration: 0.15,
-                }}
+                className="nav-link"
                 style={{
                   color:
                     "rgba(240,236,227,0.56)",
@@ -1285,13 +1422,48 @@ export default function Home() {
                 }}
               >
                 {label}
-              </motion.a>
+              </a>
             )
           )}
+        </div>
+
+        <div
+          className="desktop-location hero-status"
+          style={{
+            display: "flex",
+            alignItems:
+              "center",
+            gap:
+              "0.5rem",
+            color:
+              "rgba(240,236,227,0.38)",
+            fontFamily:
+              "'DM Sans', sans-serif",
+            fontSize:
+              "0.61rem",
+            letterSpacing:
+              "0.11em",
+            textTransform:
+              "uppercase",
+          }}
+        >
+          <span
+            className="availability-dot"
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius:
+                "50%",
+              background:
+                ACCENT,
+            }}
+          />
+          Available for work
         </div>
       </motion.nav>
 
       {/* ── Hero ── */}
+
       <section
         id="home"
         style={{
@@ -1419,7 +1591,7 @@ export default function Home() {
             >
               ●
             </motion.span>
-            Available for freelance work
+            Independent creative studio
           </motion.div>
 
           <div
@@ -1623,6 +1795,8 @@ export default function Home() {
             </MagneticBtn>
           </motion.div>
 
+          {/* Stats */}
+
           <motion.div
             initial={{
               opacity: 0,
@@ -1637,6 +1811,7 @@ export default function Home() {
             transition={{
               delay: 1.4,
             }}
+            className="hero-stats"
             style={{
               display:
                 "flex",
@@ -1699,6 +1874,7 @@ export default function Home() {
         </motion.div>
 
         {/* Scroll indicator */}
+
         <motion.div
           initial={{
             opacity: 0,
@@ -1759,7 +1935,76 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* ── Capabilities marquee ── */}
+
+      <div className="marquee">
+        <div className="marquee-track">
+          {Array.from({
+            length: 2,
+          }).map((_, groupIndex) => (
+            <div
+              key={
+                groupIndex
+              }
+              style={{
+                display:
+                  "inline-flex",
+                alignItems:
+                  "center",
+              }}
+            >
+              {[
+                "AI CONTENT",
+                "SHORT-FORM",
+                "WEB DESIGN",
+                "CREATIVE DIRECTION",
+                "DIGITAL EXPERIENCES",
+                "VISUAL SYSTEMS",
+              ].map(
+                (item, index) => (
+                  <span
+                    key={`${groupIndex}-${item}`}
+                    style={{
+                      display:
+                        "inline-flex",
+                      alignItems:
+                        "center",
+                      gap:
+                        "2rem",
+                      padding:
+                        "1rem 2rem",
+                      color:
+                        "rgba(240,236,227,0.25)",
+                      fontFamily:
+                        "'DM Sans', sans-serif",
+                      fontSize:
+                        "0.66rem",
+                      letterSpacing:
+                        "0.16em",
+                    }}
+                  >
+                    {item}
+
+                    <span
+                      style={{
+                        color:
+                          ACCENT,
+                        fontSize:
+                          "0.5rem",
+                      }}
+                    >
+                      ◆
+                    </span>
+                  </span>
+                )
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ── Services ── */}
+
       <section
         id="skills"
         className="content-section"
@@ -1813,6 +2058,8 @@ export default function Home() {
           )}
         </div>
 
+        {/* Tools */}
+
         <motion.div
           initial={{
             opacity: 0,
@@ -1826,54 +2073,79 @@ export default function Home() {
             once: true,
           }}
           style={{
-            display:
-              "flex",
-            gap:
-              "0.65rem",
-            flexWrap:
-              "wrap",
             marginTop:
-              "3rem",
+              "3.5rem",
           }}
         >
-          {[
-            "AI",
-            "Figma",
-            "CapCut",
-            "Next.js",
-            "React",
-            "Framer Motion",
-            "Vercel",
-            "Photoshop",
-          ].map(
-            (tool) => (
-              <span
-                key={
-                  tool
-                }
-                style={{
-                  padding:
-                    "0.48rem 0.95rem",
-                  border:
-                    "1px solid rgba(240,236,227,0.1)",
-                  fontFamily:
-                    "'DM Sans', sans-serif",
-                  fontSize:
-                    "0.7rem",
-                  color:
-                    "rgba(240,236,227,0.42)",
-                  letterSpacing:
-                    "0.05em",
-                }}
-              >
-                {tool}
-              </span>
-            )
-          )}
+          <div
+            style={{
+              color:
+                "rgba(240,236,227,0.25)",
+              fontSize:
+                "0.63rem",
+              letterSpacing:
+                "0.14em",
+              textTransform:
+                "uppercase",
+              marginBottom:
+                "1rem",
+              fontFamily:
+                "'DM Sans', sans-serif",
+            }}
+          >
+            Selected tools
+          </div>
+
+          <div
+            style={{
+              display:
+                "flex",
+              gap:
+                "0.65rem",
+              flexWrap:
+                "wrap",
+            }}
+          >
+            {[
+              "AI",
+              "Figma",
+              "CapCut",
+              "Next.js",
+              "React",
+              "Framer Motion",
+              "Vercel",
+              "Photoshop",
+            ].map(
+              (tool) => (
+                <span
+                  key={
+                    tool
+                  }
+                  style={{
+                    padding:
+                      "0.48rem 0.95rem",
+                    border:
+                      "1px solid rgba(240,236,227,0.1)",
+                    fontFamily:
+                      "'DM Sans', sans-serif",
+                    fontSize:
+                      "0.7rem",
+                    color:
+                      "rgba(240,236,227,0.42)",
+                    letterSpacing:
+                      "0.05em",
+                  }}
+                >
+                  {tool}
+                </span>
+              )
+            )}
+          </div>
         </motion.div>
       </section>
 
       {/* ── Projects ── */}
+
       <section
         id="projects"
         className="content-section"
@@ -1884,13 +2156,47 @@ export default function Home() {
             "relative",
         }}
       >
-        <SectionLabel>
-          03 / Work
-        </SectionLabel>
+        <div
+          style={{
+            display:
+              "flex",
+            justifyContent:
+              "space-between",
+            alignItems:
+              "end",
+            gap:
+              "2rem",
+            flexWrap:
+              "wrap",
+          }}
+        >
+          <div>
+            <SectionLabel>
+              03 / Work
+            </SectionLabel>
 
-        <SectionTitle>
-          Selected Projects
-        </SectionTitle>
+            <SectionTitle>
+              Selected Projects
+            </SectionTitle>
+          </div>
+
+          <span
+            style={{
+              color:
+                "rgba(240,236,227,0.25)",
+              fontFamily:
+                "'DM Sans', sans-serif",
+              fontSize:
+                "0.65rem",
+              letterSpacing:
+                "0.12em",
+              textTransform:
+                "uppercase",
+            }}
+          >
+            04 selected works
+          </span>
+        </div>
 
         <div
           style={{
@@ -1914,9 +2220,104 @@ export default function Home() {
             )
           )}
         </div>
+
+        <motion.div
+          initial={{
+            opacity: 0,
+          }}
+          whileInView={{
+            opacity: 1,
+          }}
+          viewport={{
+            once: true,
+          }}
+          style={{
+            marginTop:
+              "1.2rem",
+            color:
+              "rgba(240,236,227,0.22)",
+            fontFamily:
+              "'DM Sans', sans-serif",
+            fontSize:
+              "0.62rem",
+            letterSpacing:
+              "0.1em",
+            textTransform:
+              "uppercase",
+          }}
+        >
+          Click any project to explore the case study
+        </motion.div>
+      </section>
+
+      {/* ── Statement ── */}
+
+      <section
+        style={{
+          padding:
+            "6rem 3rem 9rem",
+          position:
+            "relative",
+        }}
+        className="content-section"
+      >
+        <div
+          style={{
+            maxWidth:
+              1100,
+          }}
+        >
+          <SectionLabel>
+            04 / Philosophy
+          </SectionLabel>
+
+          <motion.h2
+            initial={{
+              opacity: 0,
+              y: 25,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+            }}
+            style={{
+              marginTop:
+                "1.5rem",
+              marginBottom:
+                0,
+              fontFamily:
+                "'Syne', sans-serif",
+              fontSize:
+                "clamp(2.8rem, 7vw, 7rem)",
+              lineHeight:
+                0.94,
+              letterSpacing:
+                "-0.065em",
+              fontWeight:
+                800,
+            }}
+          >
+            GOOD DIGITAL
+            <br />
+            WORK SHOULD
+            <br />
+            <span
+              style={{
+                color:
+                  ACCENT,
+              }}
+            >
+              FEEL DIFFERENT.
+            </span>
+          </motion.h2>
+        </div>
       </section>
 
       {/* ── Contact ── */}
+
       <section
         id="contact"
         className="content-section contact-section"
@@ -1927,6 +2328,8 @@ export default function Home() {
             "relative",
           overflow:
             "hidden",
+          borderTop:
+            "1px solid rgba(240,236,227,0.06)",
         }}
       >
         <div
@@ -1951,134 +2354,194 @@ export default function Home() {
         />
 
         <SectionLabel>
-          04 / Contact
+          05 / Contact
         </SectionLabel>
 
-        <motion.h2
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          style={{
-            maxWidth:
-              760,
-            marginTop:
-              "1rem",
-            fontFamily:
-              "'Syne', sans-serif",
-            fontSize:
-              "clamp(2.7rem, 6vw, 5.5rem)",
-            fontWeight: 800,
-            letterSpacing:
-              "-0.05em",
-            lineHeight:
-              0.98,
-          }}
-        >
-          Let&apos;s build
-          something{" "}
-          <span
-            style={{
-              color:
-                ACCENT,
-            }}
-          >
-            extraordinary
-          </span>
-        </motion.h2>
-
-        <motion.p
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            delay:
-              0.15,
-          }}
-          style={{
-            maxWidth:
-              520,
-            marginTop:
-              "1.4rem",
-            color:
-              "rgba(240,236,227,0.46)",
-            fontFamily:
-              "'DM Sans', sans-serif",
-            fontSize:
-              "1rem",
-            lineHeight:
-              1.7,
-          }}
-        >
-          Have a project in
-          mind? Send me a
-          message and let&apos;s
-          talk.
-        </motion.p>
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            delay:
-              0.25,
-          }}
+        <div
+          className="contact-inner"
           style={{
             display:
-              "flex",
+              "grid",
+            gridTemplateColumns:
+              "minmax(0,1fr) minmax(300px,0.75fr)",
             gap:
-              "0.8rem",
-            flexWrap:
-              "wrap",
-            marginTop:
-              "2.5rem",
+              "5rem",
+            alignItems:
+              "end",
+            position:
+              "relative",
+            zIndex: 2,
           }}
         >
-          <ContactLink
-            icon={
-              <IconMail />
-            }
-            label="Email"
-            href="mailto:stuffmallord@gmail.com"
-          />
+          <div>
+            <motion.h2
+              initial={{
+                opacity: 0,
+                y: 30,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              style={{
+                maxWidth:
+                  820,
+                marginTop:
+                  "1rem",
+                fontFamily:
+                  "'Syne', sans-serif",
+                fontSize:
+                  "clamp(3.2rem, 8vw, 8rem)",
+                fontWeight:
+                  800,
+                letterSpacing:
+                  "-0.065em",
+                lineHeight:
+                  0.88,
+              }}
+            >
+              LET&apos;S
+              <br />
+              MAKE
+              <br />
+              <span
+                style={{
+                  color:
+                    ACCENT,
+                }}
+              >
+                SOMETHING.
+              </span>
+            </motion.h2>
+          </div>
 
-          <ContactLink
-            icon={
-              <IconTelegram />
-            }
-            label="Telegram"
-            href="https://t.me/shaahdm"
-          />
-        </motion.div>
+          <div>
+            <motion.p
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                delay:
+                  0.15,
+              }}
+              style={{
+                maxWidth:
+                  480,
+                margin:
+                  "0 0 1.8rem",
+                color:
+                  "rgba(240,236,227,0.46)",
+                fontFamily:
+                  "'DM Sans', sans-serif",
+                fontSize:
+                  "0.98rem",
+                lineHeight:
+                  1.75,
+              }}
+            >
+              Have a project, idea or
+              visual direction in mind?
+              Send me a message and
+              let&apos;s build something
+              worth remembering.
+            </motion.p>
+
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                delay:
+                  0.25,
+              }}
+              style={{
+                display:
+                  "flex",
+                flexDirection:
+                  "column",
+                alignItems:
+                  "flex-start",
+                gap:
+                  "1rem",
+              }}
+            >
+              <a
+                href="mailto:stuffmallord@gmail.com"
+                style={{
+                  color:
+                    TEXT,
+                  textDecoration:
+                    "none",
+                  fontFamily:
+                    "'Syne', sans-serif",
+                  fontSize:
+                    "clamp(1.2rem, 2.4vw, 2rem)",
+                  fontWeight:
+                    700,
+                  letterSpacing:
+                    "-0.035em",
+                  borderBottom:
+                    "1px solid rgba(125,211,252,0.35)",
+                  paddingBottom:
+                    "0.35rem",
+                }}
+              >
+                stuffmallord@gmail.com
+              </a>
+
+              <div
+                style={{
+                  display:
+                    "flex",
+                  gap:
+                    "0.8rem",
+                  flexWrap:
+                    "wrap",
+                }}
+              >
+                <ContactLink
+                  icon={
+                    <IconMail />
+                  }
+                  label="Email"
+                  href="mailto:stuffmallord@gmail.com"
+                />
+
+                <ContactLink
+                  icon={
+                    <IconTelegram />
+                  }
+                  label="Telegram"
+                  href="https://t.me/shaahdm"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
 
         <div
           style={{
             marginTop:
-              "6rem",
+              "7rem",
             paddingTop:
               "1.8rem",
             borderTop:
@@ -2108,9 +2571,11 @@ export default function Home() {
           </span>
 
           <span>
-            Creative /
-            Digital /
-            AI
+            TBILISI / GEORGIA
+          </span>
+
+          <span>
+            CREATIVE / DIGITAL / AI
           </span>
         </div>
       </section>
