@@ -426,6 +426,10 @@ export default function Home() {
         html { scroll-behavior: smooth; }
         body { margin: 0; background: ${BG}; color: ${TEXT}; }
         button, a { -webkit-tap-highlight-color: transparent; }
+         a:focus-visible, button:focus-visible {
+           outline: 1px solid ${ACCENT};
+           outline-offset: 4px;
+         }
         ::selection { background: ${ACCENT}; color: ${BG}; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: ${BG}; }
@@ -1320,8 +1324,7 @@ export default function Home() {
             animate={loaded ? { opacity: 1, y: 0 } : undefined}
             transition={{ delay: 1, duration: 0.55 }}
           >
-            Creating bold digital experiences through AI-assisted visuals,
-            design, short-form content and modern web.
+            Websites, visual systems and short-form content for brands, creators and digital projects.
           </motion.p>
 
           <motion.div
@@ -1354,8 +1357,8 @@ export default function Home() {
           >
             {[
               ["01", "Web"],
-              ["02", "AI Content"],
-              ["03", "Short-form"],
+              ["02", "Visual Systems"],
+              ["03", "Content"],
             ].map(([number, label]) => (
               <div className="hero-meta-item" key={label}>
                 <strong>{number}</strong>
@@ -1402,8 +1405,7 @@ export default function Home() {
         <SectionLabel>02 / What I Do</SectionLabel>
         <SectionTitle>Creative Services</SectionTitle>
         <p className="section-intro">
-          A flexible mix of creative direction, content, AI-assisted visuals
-          and modern front-end work for digital projects.
+          Web, visual and content work for brands, creators and digital products — from the first direction to the finished experience.
         </p>
 
         <div className="services-grid">
@@ -1455,14 +1457,10 @@ export default function Home() {
             transition={{ delay: 0.08 }}
           >
             <p>
-              MALLORD is an independent creative practice focused on
-              AI-assisted visuals, short-form content, web experiences and
-              creative direction.
+              MALLORD is an independent creative practice based in Tbilisi, working remotely across web, visual systems, short-form content and creative direction.
             </p>
             <p>
-              I like taking rough ideas and turning them into clear visual
-              systems — from references and direction to the final digital
-              piece.
+              I take rough ideas, references and loose direction and turn them into a clear visual system — then build, edit or refine the final piece.
             </p>
             <a className="about-link" href="#contact">
               Start a conversation
@@ -1500,7 +1498,7 @@ export default function Home() {
             <SectionLabel>04 / Work</SectionLabel>
             <SectionTitle>Selected Projects</SectionTitle>
           </div>
-          <span className="projects-count">04 selected works</span>
+          <span className="projects-count">04 self-initiated concepts</span>
         </div>
 
         <div className="project-list">
@@ -1509,9 +1507,7 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="projects-note">
-          Click any project to explore the case study
-        </div>
+        <div className="projects-note">Self-initiated concepts / click to explore the case study</div>
       </section>
 
       <section className="section statement">
@@ -1556,8 +1552,7 @@ export default function Home() {
             transition={{ delay: 0.08 }}
           >
             <p className="contact-copy">
-              Have a project, idea or visual direction in mind? Send me a
-              message and let&apos;s build something worth remembering.
+              Have a website, launch, campaign or visual direction in mind? Tell me what you&apos;re building and let&apos;s turn the idea into a focused digital or visual piece.
             </p>
 
             <a className="contact-email" href="mailto:stuffmallord@gmail.com">

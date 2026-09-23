@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import type { CSSProperties } from "react";
 
 type LayoutType =
   | "afterimage"
@@ -238,7 +239,7 @@ function MainImage({
   sizes?: string;
   priority?: boolean;
   objectPosition?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }) {
   return (
     <div className={`main-image ${className}`} style={style}>
@@ -840,13 +841,17 @@ export default async function ProjectPage({
         html { scroll-behavior: smooth; }
         body { margin: 0; background: #060608; color: #F0ECE3; }
         a { -webkit-tap-highlight-color: transparent; }
+         a:focus-visible {
+           outline: 1px solid #7DD3FC;
+           outline-offset: 4px;
+         }
 
         .case-page {
           min-height: 100vh;
           overflow-x: hidden;
           background: #060608;
           color: #F0ECE3;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         .case-nav {
@@ -865,8 +870,11 @@ export default async function ProjectPage({
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
         }
-
-        .case-logo {
+         .case-page h1,
+         .case-page h2,
+         .case-page h3,
+         .case-page h4,
+         .case-logo {
           color: #7DD3FC;
           text-decoration: none;
           font-size: .86rem;
@@ -892,6 +900,29 @@ export default async function ProjectPage({
           color: #7DD3FC;
           transform: translateX(-3px);
         }
+
+         .case-nav-actions {
+           display: flex;
+           align-items: center;
+           gap: 1rem;
+         }
+
+         .case-nav-cta {
+           padding: .5rem .7rem;
+           border: 1px solid rgba(125,211,252,.28);
+           color: #7DD3FC;
+           text-decoration: none;
+           font-size: .56rem;
+           letter-spacing: .12em;
+           text-transform: uppercase;
+           transition: background .2s ease, border-color .2s ease, color .2s ease;
+         }
+
+         .case-nav-cta:hover {
+           background: rgba(125,211,252,.06);
+           border-color: #7DD3FC;
+           color: #F0ECE3;
+         }
 
         .case-link {
           transition: color .2s ease, transform .2s ease;
@@ -974,6 +1005,17 @@ export default async function ProjectPage({
           letter-spacing: .09em;
           text-transform: uppercase;
         }
+
+         .case-status {
+           display: inline-flex;
+           margin-top: .75rem;
+           padding: .32rem .55rem;
+           border: 1px solid rgba(125,211,252,.16);
+           color: rgba(125,211,252,.58);
+           font-size: .54rem;
+           letter-spacing: .11em;
+           text-transform: uppercase;
+         }
 
         .shared-info {
           max-width: 1250px;
@@ -1357,6 +1399,8 @@ export default async function ProjectPage({
 
         @media (max-width: 700px) {
           .case-nav { min-height: 66px; padding: 0 1.05rem; }
+           .case-nav-actions { gap: .5rem; }
+           .case-nav-cta { padding: .45rem .55rem; font-size: .49rem; }
           .case-nav-back { font-size: .56rem; }
           .case-hero { padding-top: 125px; padding-bottom: 40px; }
           .case-title { font-size: clamp(3.2rem,16vw,7rem); }
@@ -1430,7 +1474,10 @@ export default async function ProjectPage({
       <nav className="case-nav" aria-label="Project navigation">
         <a href="/" className="case-logo">MALLORD</a>
         <span className="case-nav-title">Selected Project / Case Study</span>
-        <a href="/#projects" className="case-nav-back">← Back to work</a>
+        <div className="case-nav-actions">
+           <a href="/#contact" className="case-nav-cta">Start a project</a>
+           <a href="/#projects" className="case-nav-back">← Back to work</a>
+         </div>
       </nav>
 
       <header className="case-hero">
@@ -1447,6 +1494,7 @@ export default async function ProjectPage({
           <div>
             <p className="case-intro">{project.intro}</p>
             <Tags items={project.tags} />
+             <div className="case-status">Self-initiated concept</div>
           </div>
         </div>
       </header>
