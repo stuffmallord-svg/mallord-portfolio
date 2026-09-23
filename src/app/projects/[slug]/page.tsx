@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 type LayoutType =
   | "afterimage"
@@ -6,24 +8,23 @@ type LayoutType =
   | "deep-blue"
   | "glass-object";
 
-const projects: Record<
-  LayoutType,
-  {
-    number: string;
-    title: string;
-    category: string;
-    image: string;
-    intro: string;
-    overview: string;
-    challenge: string;
-    approach: string;
-    role: string[];
-    deliverables: string[];
-    tags: string[];
-    statement: string;
-    layout: LayoutType;
-  }
-> = {
+interface ProjectData {
+  number: string;
+  title: string;
+  category: string;
+  image: string;
+  intro: string;
+  overview: string;
+  challenge: string;
+  approach: string;
+  role: string[];
+  deliverables: string[];
+  tags: string[];
+  statement: string;
+  layout: LayoutType;
+}
+
+const projects: Record<LayoutType, ProjectData> = {
   afterimage: {
     number: "01",
     title: "AFTERIMAGE",
@@ -169,31 +170,47 @@ const projects: Record<
   },
 };
 
+const projectSlugs = Object.keys(projects) as LayoutType[];
+
 export function generateStaticParams() {
-  return Object.keys(projects).map((slug) => ({
-    slug,
-  }));
+  return projectSlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
-
-  const project =
-    projects[slug as LayoutType];
+  const project = projects[slug as LayoutType];
 
   if (!project) {
     return {
       title: "Project — MALLORD",
+      description: "Selected creative work by MALLORD.",
     };
   }
 
   return {
     title: `${project.title} — MALLORD`,
     description: project.intro,
+    openGraph: {
+      title: `${project.title} — MALLORD`,
+      description: project.intro,
+      type: "article",
+      images: [
+        {
+          url: project.image,
+          alt: `${project.title} — MALLORD`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} — MALLORD`,
+      description: project.intro,
+      images: [project.image],
+    },
   };
 }
 
@@ -205,69 +222,19 @@ function Label({
   text: string;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.7rem",
-        marginBottom: "1.15rem",
-        color: "#7DD3FC",
-        fontSize: "0.63rem",
-        letterSpacing: "0.17em",
-        textTransform: "uppercase",
-      }}
-    >
-      <span>{number}</span>
-
-      <span
-        style={{
-          width: 25,
-          height: 1,
-          background: "#7DD3FC",
-        }}
-      />
-
-      <span
-        style={{
-          color: "rgba(240,236,227,0.4)",
-        }}
-      >
-        {text}
-      </span>
+    <div className="case-label">
+      <span className="case-label-number">{number}</span>
+      <span className="case-label-line" />
+      <span className="case-label-text">{text}</span>
     </div>
   );
 }
 
-function Tags({
-  items,
-}: {
-  items: string[];
-}) {
+function Tags({ items }: { items: string[] }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "0.45rem",
-        marginTop: "1.2rem",
-      }}
-    >
+    <div className="case-tags">
       {items.map((tag) => (
-        <span
-          key={tag}
-          style={{
-            padding: "0.35rem 0.6rem",
-            border:
-              "1px solid rgba(240,236,227,0.12)",
-            color:
-              "rgba(240,236,227,0.42)",
-            fontSize: "0.58rem",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-          }}
-        >
-          {tag}
-        </span>
+        <span key={tag}>{tag}</span>
       ))}
     </div>
   );
@@ -277,852 +244,219 @@ function MainImage({
   src,
   alt,
   className = "",
+  sizes = "100vw",
+  priority = false,
 }: {
   src: string;
   alt: string;
   className?: string;
+  sizes?: string;
+  priority?: boolean;
 }) {
   return (
-    <div
-      className={`main-image ${className}`}
-      style={{
-        width: "100%",
-        overflow: "hidden",
-        background: "#0A0A0D",
-        border:
-          "1px solid rgba(240,236,227,0.08)",
-      }}
-    >
-      <img
+    <div className={`main-image ${className}`}>
+      <Image
         src={src}
         alt={alt}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          display: "block",
-        }}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className="main-image-img"
       />
     </div>
   );
 }
 
-function SharedInfo({
-  project,
-}: {
-  project: (typeof projects)[LayoutType];
-}) {
+function SharedInfo({ project }: { project: ProjectData }) {
   return (
-    <section
-      style={{
-        maxWidth: 1250,
-        margin: "0 auto",
-        padding: "90px 5vw 130px",
-      }}
-    >
-      <div
-        className="info-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "minmax(0,1fr) minmax(230px,0.4fr)",
-          gap: "5rem",
-          paddingBottom: "6rem",
-          borderBottom:
-            "1px solid rgba(240,236,227,0.08)",
-        }}
-      >
+    <section className="shared-info">
+      <div className="info-grid overview-grid">
         <div>
-          <Label
-            number="00"
-            text="Overview"
-          />
-
-          <p
-            style={{
-              margin: 0,
-              maxWidth: 900,
-              color:
-                "rgba(240,236,227,0.8)",
-              fontSize:
-                "clamp(1.5rem, 3vw, 2.7rem)",
-              lineHeight: 1.18,
-              letterSpacing:
-                "-0.035em",
-              fontWeight: 600,
-            }}
-          >
-            {project.overview}
-          </p>
+          <Label number="00" text="Overview" />
+          <p className="overview-text">{project.overview}</p>
         </div>
 
         <div>
-          <Label
-            number="ROLE"
-            text="What I Did"
-          />
-
-          {project.role.map(
-            (item) => (
-              <div
-                key={item}
-                className="list-item"
-                style={{
-                  padding:
-                    "0.72rem 0",
-                  borderBottom:
-                    "1px solid rgba(240,236,227,0.08)",
-                  color:
-                    "rgba(240,236,227,0.65)",
-                  fontSize: "0.85rem",
-                }}
-              >
-                {item}
-              </div>
-            )
-          )}
+          <Label number="ROLE" text="What I Did" />
+          <div className="line-list">
+            {project.role.map((item) => (
+              <div key={item}>{item}</div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div
-        className="info-grid three"
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(3,minmax(0,1fr))",
-          gap: "4rem",
-          padding:
-            "6rem 0",
-        }}
-      >
+      <div className="info-grid detail-grid">
         <div>
-          <Label
-            number="01"
-            text="Challenge"
-          />
-
-          <p
-            style={{
-              margin: 0,
-              color:
-                "rgba(240,236,227,0.62)",
-              lineHeight: 1.8,
-              fontSize: "0.9rem",
-            }}
-          >
-            {project.challenge}
-          </p>
+          <Label number="01" text="Challenge" />
+          <p className="detail-text">{project.challenge}</p>
         </div>
 
         <div>
-          <Label
-            number="02"
-            text="Approach"
-          />
-
-          <p
-            style={{
-              margin: 0,
-              color:
-                "rgba(240,236,227,0.62)",
-              lineHeight: 1.8,
-              fontSize: "0.9rem",
-            }}
-          >
-            {project.approach}
-          </p>
+          <Label number="02" text="Approach" />
+          <p className="detail-text">{project.approach}</p>
         </div>
 
         <div>
-          <Label
-            number="03"
-            text="Deliverables"
-          />
-
-          {project.deliverables.map(
-            (item) => (
-              <div
-                key={item}
-                className="list-item"
-                style={{
-                  padding:
-                    "0.72rem 0",
-                  borderBottom:
-                    "1px solid rgba(240,236,227,0.08)",
-                  color:
-                    "rgba(240,236,227,0.65)",
-                  fontSize:
-                    "0.85rem",
-                }}
-              >
-                {item}
-              </div>
-            )
-          )}
+          <Label number="03" text="Deliverables" />
+          <div className="line-list">
+            {project.deliverables.map((item) => (
+              <div key={item}>{item}</div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONCRETE
-// ─────────────────────────────────────────────────────────────────────────────
-
-function ConcreteLayout({
-  project,
-}: {
-  project: (typeof projects)["concrete"];
-}) {
+function ConcreteLayout({ project }: { project: ProjectData }) {
   return (
     <>
-      <section
-        style={{
-          maxWidth: 1450,
-          margin: "0 auto",
-          padding: "0 5vw 110px",
-        }}
-      >
+      <section className="wide-media-section">
         <MainImage
           src={project.image}
           alt={project.title}
+          sizes="(max-width: 900px) 90vw, 1350px"
         />
       </section>
 
-      <section
-        style={{
-          maxWidth: 1250,
-          margin: "0 auto",
-          padding:
-            "0 5vw 130px",
-        }}
-      >
-        <div
-          className="concrete-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "0.7fr 1.3fr",
-            gap: "5rem",
-            alignItems: "start",
-          }}
-        >
-          <div
-            style={{
-              position:
-                "sticky",
-              top: "110px",
-            }}
-          >
-            <Label
-              number="04"
-              text="Visual Language"
-            />
-
-            <h2
-              style={{
-                margin: 0,
-                fontSize:
-                  "clamp(2.8rem, 6vw, 6.5rem)",
-                lineHeight: 0.88,
-                letterSpacing:
-                  "-0.065em",
-                fontWeight: 800,
-              }}
-            >
+      <section className="layout-section concrete-section">
+        <div className="concrete-grid">
+          <div className="sticky-title">
+            <Label number="04" text="Visual Language" />
+            <h2>
               FORM
               <br />
-              <span
-                style={{
-                  color: "#7DD3FC",
-                }}
-              >
-                / SPACE
-              </span>
+              <span>/ SPACE</span>
             </h2>
           </div>
 
           <div>
-            <p
-              style={{
-                margin: 0,
-                fontSize:
-                  "clamp(1.35rem, 2.7vw, 2.4rem)",
-                lineHeight: 1.2,
-                letterSpacing:
-                  "-0.03em",
-                color:
-                  "rgba(240,236,227,0.86)",
-              }}
-            >
-              Architecture becomes
-              graphic composition when
-              the camera stops
-              documenting and starts
-              designing.
+            <p className="large-copy">
+              Architecture becomes graphic composition when the camera stops
+              documenting and starts designing.
             </p>
 
-            <div
-              style={{
-                marginTop: "4rem",
-                borderTop:
-                  "1px solid rgba(240,236,227,0.08)",
-              }}
-            >
+            <div className="visual-points">
               {[
-                [
-                  "01",
-                  "Geometry",
-                  "Hard edges, repetition and structural rhythm.",
-                ],
-                [
-                  "02",
-                  "Light",
-                  "Natural contrast used as a graphic element.",
-                ],
-                [
-                  "03",
-                  "Silence",
-                  "Negative space keeps the composition controlled.",
-                ],
-              ].map(
-                ([num, title, text]) => (
-                  <div
-                    key={num}
-                    style={{
-                      display:
-                        "grid",
-                      gridTemplateColumns:
-                        "45px 170px 1fr",
-                      gap:
-                        "1rem",
-                      padding:
-                        "1.25rem 0",
-                      borderBottom:
-                        "1px solid rgba(240,236,227,0.08)",
-                      alignItems:
-                        "start",
-                    }}
-                  >
-                    <span
-                      style={{
-                        color:
-                          "#7DD3FC",
-                        fontSize:
-                          "0.65rem",
-                      }}
-                    >
-                      {num}
-                    </span>
-
-                    <span
-                      style={{
-                        fontWeight:
-                          700,
-                        fontSize:
-                          "0.9rem",
-                      }}
-                    >
-                      {title}
-                    </span>
-
-                    <span
-                      style={{
-                        color:
-                          "rgba(240,236,227,0.42)",
-                        fontSize:
-                          "0.82rem",
-                        lineHeight:
-                          1.55,
-                      }}
-                    >
-                      {text}
-                    </span>
-                  </div>
-                )
-              )}
+                ["01", "Geometry", "Hard edges, repetition and structural rhythm."],
+                ["02", "Light", "Natural contrast used as a graphic element."],
+                ["03", "Silence", "Negative space keeps the composition controlled."],
+              ].map(([num, title, text]) => (
+                <div className="visual-point" key={num}>
+                  <span>{num}</span>
+                  <strong>{title}</strong>
+                  <p>{text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section
-        style={{
-          borderTop:
-            "1px solid rgba(240,236,227,0.08)",
-          borderBottom:
-            "1px solid rgba(240,236,227,0.08)",
-          padding:
-            "6rem 5vw",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              maxWidth: 950,
-              fontSize:
-                "clamp(2rem, 4.5vw, 4.5rem)",
-              lineHeight: 1,
-              letterSpacing:
-                "-0.055em",
-              fontWeight: 700,
-            }}
-          >
-            {project.statement}
-          </p>
-        </div>
-      </section>
+      <StatementSection text={project.statement} />
     </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DEEP BLUE
-// ─────────────────────────────────────────────────────────────────────────────
+function DeepBlueLayout({ project }: { project: ProjectData }) {
+  const systemCards = [
+    ["01", "LIGHT", "Controlled glow and depth."],
+    ["02", "FORM", "Abstract shapes as identity."],
+    ["03", "DEPTH", "Layered space and atmosphere."],
+    ["04", "RHYTHM", "A visual language ready for motion."],
+  ];
 
-function DeepBlueLayout({
-  project,
-}: {
-  project: (typeof projects)["deep-blue"];
-}) {
   return (
     <>
-      <section
-        style={{
-          position:
-            "relative",
-          minHeight: "78vh",
-          display:
-            "flex",
-          alignItems:
-            "center",
-          justifyContent:
-            "center",
-          overflow:
-            "hidden",
-          borderTop:
-            "1px solid rgba(240,236,227,0.05)",
-          borderBottom:
-            "1px solid rgba(240,236,227,0.05)",
-        }}
-      >
-        <div
-          style={{
-            position:
-              "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(circle at center, rgba(56,189,248,0.12), transparent 48%)",
-          }}
-        />
-
-        <div
-          style={{
-            position:
-              "relative",
-            width: "min(1000px,88vw)",
-            aspectRatio:
-              "1 / 1",
-            overflow:
-              "hidden",
-            borderRadius:
-              "50%",
-            border:
-              "1px solid rgba(125,211,252,0.12)",
-            boxShadow:
-              "0 0 120px rgba(56,189,248,0.08)",
-          }}
-        >
-          <img
+      <section className="deep-hero">
+        <div className="deep-glow" />
+        <div className="deep-circle">
+          <Image
             src={project.image}
             alt={project.title}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display:
-                "block",
-              transform:
-                "scale(1.08)",
-            }}
+            fill
+            priority
+            sizes="(max-width: 900px) 88vw, 1000px"
+            className="deep-image"
           />
-
-          <div
-            style={{
-              position:
-                "absolute",
-              inset:
-                "15%",
-              border:
-                "1px solid rgba(125,211,252,0.18)",
-              borderRadius:
-                "50%",
-            }}
-          />
-
-          <div
-            style={{
-              position:
-                "absolute",
-              inset:
-                "30%",
-              border:
-                "1px solid rgba(125,211,252,0.14)",
-              borderRadius:
-                "50%",
-            }}
-          />
+          <div className="deep-ring ring-one" />
+          <div className="deep-ring ring-two" />
         </div>
 
-        <div
-          style={{
-            position:
-              "absolute",
-            bottom:
-              "2rem",
-            left:
-              "5vw",
-            right:
-              "5vw",
-            display:
-              "flex",
-            justifyContent:
-              "space-between",
-            alignItems:
-              "center",
-            color:
-              "rgba(240,236,227,0.28)",
-            fontSize:
-              "0.62rem",
-            letterSpacing:
-              "0.13em",
-            textTransform:
-              "uppercase",
-          }}
-        >
-          <span>
-            Experimental visual system
-          </span>
-
-          <span>
-            AI / Digital / 03
-          </span>
+        <div className="deep-hero-meta">
+          <span>Experimental visual system</span>
+          <span>AI / Digital / 03</span>
         </div>
       </section>
 
-      <section
-        style={{
-          maxWidth: 1250,
-          margin: "0 auto",
-          padding:
-            "100px 5vw 130px",
-        }}
-      >
-        <div
-          className="deep-intro"
-          style={{
-            display:
-              "grid",
-            gridTemplateColumns:
-              "0.45fr 1.55fr",
-            gap:
-              "4rem",
-          }}
-        >
+      <section className="layout-section deep-section">
+        <div className="deep-intro">
           <div>
-            <Label
-              number="04"
-              text="System"
-            />
+            <Label number="04" text="System" />
           </div>
 
           <div>
-            <h2
-              style={{
-                margin:
-                  "0 0 3rem",
-                fontSize:
-                  "clamp(2.5rem, 6vw, 6rem)",
-                lineHeight:
-                  0.9,
-                letterSpacing:
-                  "-0.06em",
-              }}
-            >
+            <h2 className="deep-heading">
               AN IMAGE
               <br />
-              <span
-                style={{
-                  color:
-                    "#7DD3FC",
-                }}
-              >
-                BECOMES A WORLD.
-              </span>
+              <span>BECOMES A WORLD.</span>
             </h2>
 
-            <div
-              className="deep-columns"
-              style={{
-                display:
-                  "grid",
-                gridTemplateColumns:
-                  "1fr 1fr",
-                gap:
-                  "3rem",
-              }}
-            >
-              <p
-                style={{
-                  margin: 0,
-                  color:
-                    "rgba(240,236,227,0.52)",
-                  lineHeight:
-                    1.8,
-                  fontSize:
-                    "0.92rem",
-                }}
-              >
-                {project.approach}
-              </p>
-
-              <p
-                style={{
-                  margin: 0,
-                  color:
-                    "rgba(240,236,227,0.52)",
-                  lineHeight:
-                    1.8,
-                  fontSize:
-                    "0.92rem",
-                }}
-              >
-                The same visual language
-                can expand into covers,
-                social assets, campaign
-                frames and motion pieces.
-                The objective is
-                consistency, not repetition.
+            <div className="deep-columns">
+              <p className="detail-text">{project.approach}</p>
+              <p className="detail-text">
+                The same visual language can expand into covers, social assets,
+                campaign frames and motion pieces. The objective is consistency,
+                not repetition.
               </p>
             </div>
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop:
-              "8rem",
-            display:
-              "grid",
-            gridTemplateColumns:
-              "1fr 1fr",
-            gap:
-              "1rem",
-          }}
-          className="deep-cards"
-        >
-          {[
-            ["01", "LIGHT", "Controlled glow and depth."],
-            ["02", "FORM", "Abstract shapes as identity."],
-            ["03", "DEPTH", "Layered space and atmosphere."],
-            ["04", "RHYTHM", "A visual language ready for motion."],
-          ].map(
-            ([num, title, text]) => (
-              <div
-                key={num}
-                style={{
-                  minHeight:
-                    220,
-                  padding:
-                    "1.6rem",
-                  border:
-                    "1px solid rgba(240,236,227,0.08)",
-                  background:
-                    "rgba(125,211,252,0.015)",
-                }}
-              >
-                <div
-                  style={{
-                    color:
-                      "#7DD3FC",
-                    fontSize:
-                      "0.63rem",
-                    marginBottom:
-                      "4rem",
-                  }}
-                >
-                  {num}
-                </div>
-
-                <div
-                  style={{
-                    fontSize:
-                      "1.4rem",
-                    fontWeight:
-                      700,
-                    letterSpacing:
-                      "-0.03em",
-                  }}
-                >
-                  {title}
-                </div>
-
-                <p
-                  style={{
-                    margin:
-                      "0.7rem 0 0",
-                    color:
-                      "rgba(240,236,227,0.4)",
-                    fontSize:
-                      "0.82rem",
-                    lineHeight:
-                      1.6,
-                  }}
-                >
-                  {text}
-                </p>
-              </div>
-            )
-          )}
+        <div className="deep-cards">
+          {systemCards.map(([num, title, text]) => (
+            <article key={num}>
+              <span>{num}</span>
+              <strong>{title}</strong>
+              <p>{text}</p>
+            </article>
+          ))}
         </div>
 
-        <div
-          style={{
-            marginTop:
-              "8rem",
-            paddingTop:
-              "2rem",
-            borderTop:
-              "1px solid rgba(240,236,227,0.08)",
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              maxWidth:
-                1000,
-              fontSize:
-                "clamp(2rem, 4.5vw, 4.7rem)",
-              lineHeight:
-                1,
-              letterSpacing:
-                "-0.055em",
-              fontWeight:
-                700,
-            }}
-          >
-            {project.statement}
-          </p>
-        </div>
+        <StatementSection text={project.statement} inline />
       </section>
     </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GLASS OBJECT
-// ─────────────────────────────────────────────────────────────────────────────
+function GlassObjectLayout({ project }: { project: ProjectData }) {
+  const specs = [
+    ["01", "Material", "Glass"],
+    ["02", "Direction", "Minimal"],
+    ["03", "Mood", "Futuristic"],
+    ["04", "Focus", "Form"],
+  ];
 
-function GlassObjectLayout({
-  project,
-}: {
-  project: (typeof projects)["glass-object"];
-}) {
   return (
     <>
-      <section
-        style={{
-          maxWidth: 1450,
-          margin: "0 auto",
-          padding:
-            "0 5vw 120px",
-        }}
-      >
-        <div
-          className="glass-hero"
-          style={{
-            display:
-              "grid",
-            gridTemplateColumns:
-              "0.7fr 1.3fr",
-            gap:
-              "1rem",
-            alignItems:
-              "stretch",
-          }}
-        >
-          <div
-            style={{
-              minHeight:
-                650,
-              padding:
-                "2rem",
-              border:
-                "1px solid rgba(240,236,227,0.08)",
-              display:
-                "flex",
-              flexDirection:
-                "column",
-              justifyContent:
-                "space-between",
-              background:
-                "rgba(240,236,227,0.012)",
-            }}
-          >
+      <section className="wide-media-section glass-hero-section">
+        <div className="glass-hero">
+          <div className="glass-intro-panel">
             <div>
-              <Label
-                number="04"
-                text="Product Study"
-              />
-
-              <h2
-                style={{
-                  margin:
-                    "3rem 0 0",
-                  fontSize:
-                    "clamp(2.5rem, 6vw, 6rem)",
-                  lineHeight:
-                    0.9,
-                  letterSpacing:
-                    "-0.06em",
-                }}
-              >
+              <Label number="04" text="Product Study" />
+              <h2>
                 LESS
                 <br />
-                <span
-                  style={{
-                    color:
-                      "#7DD3FC",
-                  }}
-                >
-                  BUT
-                  <br />
-                  BETTER.
-                </span>
+                <span>BUT</span>
+                <br />
+                <span>BETTER.</span>
               </h2>
             </div>
 
-            <p
-              style={{
-                margin: 0,
-                maxWidth:
-                  300,
-                color:
-                  "rgba(240,236,227,0.42)",
-                fontSize:
-                  "0.85rem",
-                lineHeight:
-                  1.7,
-              }}
-            >
-              Product direction built around
-              material, silhouette, reflection
+            <p>
+              Product direction built around material, silhouette, reflection
               and controlled presentation.
             </p>
           </div>
@@ -1131,404 +465,127 @@ function GlassObjectLayout({
             src={project.image}
             alt={project.title}
             className="glass-main-image"
+            sizes="(max-width: 900px) 90vw, 900px"
+            priority
           />
         </div>
       </section>
 
-      <section
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding:
-            "0 5vw 120px",
-        }}
-      >
-        <div
-          className="glass-specs"
-          style={{
-            display:
-              "grid",
-            gridTemplateColumns:
-              "repeat(4,1fr)",
-            borderTop:
-              "1px solid rgba(240,236,227,0.08)",
-            borderBottom:
-              "1px solid rgba(240,236,227,0.08)",
-          }}
-        >
-          {[
-            ["01", "Material", "Glass"],
-            ["02", "Direction", "Minimal"],
-            ["03", "Mood", "Futuristic"],
-            ["04", "Focus", "Form"],
-          ].map(
-            ([num, title, value]) => (
-              <div
-                key={num}
-                style={{
-                  padding:
-                    "1.5rem",
-                  borderRight:
-                    "1px solid rgba(240,236,227,0.08)",
-                }}
-              >
-                <div
-                  style={{
-                    color:
-                      "#7DD3FC",
-                    fontSize:
-                      "0.6rem",
-                    marginBottom:
-                      "2rem",
-                  }}
-                >
-                  {num}
-                </div>
-
-                <div
-                  style={{
-                    color:
-                      "rgba(240,236,227,0.38)",
-                    fontSize:
-                      "0.66rem",
-                    letterSpacing:
-                      "0.12em",
-                    textTransform:
-                      "uppercase",
-                  }}
-                >
-                  {title}
-                </div>
-
-                <div
-                  style={{
-                    marginTop:
-                      "0.55rem",
-                    fontSize:
-                      "0.9rem",
-                    fontWeight:
-                      600,
-                  }}
-                >
-                  {value}
-                </div>
-              </div>
-            )
-          )}
+      <section className="layout-section glass-section">
+        <div className="glass-specs">
+          {specs.map(([num, title, value]) => (
+            <div key={num}>
+              <span>{num}</span>
+              <small>{title}</small>
+              <strong>{value}</strong>
+            </div>
+          ))}
         </div>
 
-        <div
-          style={{
-            marginTop:
-              "7rem",
-            display:
-              "grid",
-            gridTemplateColumns:
-              "0.8fr 1.2fr",
-            gap:
-              "5rem",
-            alignItems:
-              "end",
-          }}
-          className="glass-copy"
-        >
+        <div className="glass-copy">
           <div>
-            <Label
-              number="05"
-              text="Material"
-            />
-
-            <p
-              style={{
-                margin: 0,
-                fontSize:
-                  "clamp(2rem, 4vw, 4.2rem)",
-                lineHeight:
-                  1,
-                letterSpacing:
-                  "-0.05em",
-                fontWeight:
-                  700,
-              }}
-            >
-              Transparency becomes
-              <span
-                style={{
-                  color:
-                    "#7DD3FC",
-                }}
-              >
-                {" "}
-                structure.
-              </span>
+            <Label number="05" text="Material" />
+            <p>
+              Transparency becomes <span>structure.</span>
             </p>
           </div>
 
-          <p
-            style={{
-              margin: 0,
-              maxWidth:
-                580,
-              color:
-                "rgba(240,236,227,0.5)",
-              fontSize:
-                "0.95rem",
-              lineHeight:
-                1.8,
-            }}
-          >
-            {project.approach}
-          </p>
+          <p className="detail-text">{project.approach}</p>
         </div>
 
-        <div
-          style={{
-            marginTop:
-              "8rem",
-            padding:
-              "5rem 0",
-            borderTop:
-              "1px solid rgba(240,236,227,0.08)",
-            borderBottom:
-              "1px solid rgba(240,236,227,0.08)",
-          }}
-        >
-          <p
-            style={{
-              maxWidth:
-                1000,
-              margin: 0,
-              fontSize:
-                "clamp(2rem, 4.5vw, 4.7rem)",
-              lineHeight:
-                1,
-              letterSpacing:
-                "-0.055em",
-              fontWeight:
-                700,
-            }}
-          >
-            {project.statement}
-          </p>
-        </div>
+        <StatementSection text={project.statement} inline />
       </section>
     </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AFTERIMAGE
-// ─────────────────────────────────────────────────────────────────────────────
-
-function AfterimageLayout({
-  project,
-}: {
-  project: (typeof projects)["afterimage"];
-}) {
+function AfterimageLayout({ project }: { project: ProjectData }) {
   return (
     <>
-      <section
-        style={{
-          maxWidth: 1450,
-          margin: "0 auto",
-          padding:
-            "0 5vw 110px",
-        }}
-      >
+      <section className="wide-media-section">
         <MainImage
           src={project.image}
           alt={project.title}
           className="afterimage-main"
+          sizes="(max-width: 900px) 90vw, 1350px"
+          priority
         />
       </section>
 
-      <section
-        style={{
-          maxWidth: 1250,
-          margin: "0 auto",
-          padding:
-            "0 5vw 130px",
-        }}
-      >
-        <div
-          style={{
-            borderTop:
-              "1px solid rgba(240,236,227,0.08)",
-            paddingTop:
-              "5rem",
-          }}
-        >
-          <Label
-            number="04"
-            text="Visual Language"
-          />
-
-          <div
-            className="afterimage-grid"
-            style={{
-              display:
-                "grid",
-              gridTemplateColumns:
-                "minmax(0,1.2fr) minmax(280px,0.8fr)",
-              gap:
-                "3rem",
-              alignItems:
-                "end",
-            }}
-          >
-            <div>
-              <h2
-                style={{
-                  margin:
-                    0,
-                  fontSize:
-                    "clamp(2.8rem, 6vw, 6rem)",
-                  lineHeight:
-                    0.88,
-                  letterSpacing:
-                    "-0.06em",
-                  fontWeight:
-                    800,
-                }}
-              >
-                LIGHT
-                <br />
-                BECOMES
-                <br />
-                <span
-                  style={{
-                    color:
-                      "#7DD3FC",
-                  }}
-                >
-                  MOTION.
-                </span>
-              </h2>
-            </div>
-
-            <p
-              style={{
-                margin:
-                  0,
-                color:
-                  "rgba(240,236,227,0.5)",
-                fontSize:
-                  "0.92rem",
-                lineHeight:
-                  1.75,
-              }}
-            >
-              {project.approach}
-            </p>
+      <section className="layout-section afterimage-section">
+        <div className="afterimage-head">
+          <div>
+            <Label number="04" text="Visual Language" />
+            <h2>
+              LIGHT
+              <br />
+              BECOMES
+              <br />
+              <span>MOTION.</span>
+            </h2>
           </div>
+
+          <p className="detail-text">{project.approach}</p>
         </div>
 
-        <div
-          style={{
-            marginTop:
-              "5rem",
-            display:
-              "grid",
-            gridTemplateColumns:
-              "1.4fr 0.6fr",
-            gap:
-              "1rem",
-          }}
-          className="afterimage-gallery"
-        >
+        <div className="afterimage-detail-grid">
           <MainImage
             src={project.image}
-            alt={`${project.title} direction`}
+            alt={`${project.title} detail`}
+            sizes="(max-width: 900px) 90vw, 800px"
           />
 
-          <div
-            style={{
-              display:
-                "grid",
-              gridTemplateRows:
-                "1fr 1fr",
-              gap:
-                "1rem",
-            }}
-          >
-            <MainImage
-              src={project.image}
-              alt={`${project.title} detail one`}
-            />
+          <div className="afterimage-cards">
+            <article>
+              <Label number="01" text="Atmosphere" />
+              <p>
+                Cold light.
+                <br />
+                Deep shadows.
+              </p>
+            </article>
 
-            <MainImage
-              src={project.image}
-              alt={`${project.title} detail two`}
-            />
+            <article>
+              <Label number="02" text="Direction" />
+              <p>
+                Residual
+                <br />
+                <span>motion.</span>
+              </p>
+            </article>
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop:
-              "7rem",
-            padding:
-              "5rem 0",
-            borderTop:
-              "1px solid rgba(240,236,227,0.08)",
-            borderBottom:
-              "1px solid rgba(240,236,227,0.08)",
-          }}
-        >
-          <div
-            className="afterimage-mood"
-            style={{
-              display:
-                "grid",
-              gridTemplateColumns:
-                "0.7fr 1.3fr",
-              gap:
-                "4rem",
-            }}
-          >
-            <div>
-              <Label
-                number="05"
-                text="Mood"
-              />
-            </div>
-
-            <p
-              style={{
-                margin: 0,
-                fontSize:
-                  "clamp(2rem, 4vw, 4.3rem)",
-                lineHeight:
-                  1.02,
-                letterSpacing:
-                  "-0.05em",
-                fontWeight:
-                  700,
-              }}
-            >
-              Cold light.
-              <br />
-              Deep shadows.
-              <br />
-              <span
-                style={{
-                  color:
-                    "rgba(125,211,252,0.72)",
-                }}
-              >
-                Residual motion.
-              </span>
-            </p>
-          </div>
+        <div className="afterimage-mood">
+          <Label number="05" text="Mood" />
+          <p>
+            Cold light.
+            <br />
+            Deep shadows.
+            <br />
+            <span>Residual motion.</span>
+          </p>
         </div>
       </section>
     </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────────────────────────────────────
+function StatementSection({
+  text,
+  inline = false,
+}: {
+  text: string;
+  inline?: boolean;
+}) {
+  return (
+    <div
+      className={inline ? "statement-section inline" : "statement-section"}
+    >
+      <p>{text}</p>
+    </div>
+  );
+}
 
 export default async function ProjectPage({
   params,
@@ -1536,25 +593,14 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  const project =
-    projects[slug as LayoutType];
+  const project = projects[slug as LayoutType];
 
   if (!project) {
     notFound();
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#060608",
-        color: "#F0ECE3",
-        fontFamily:
-          "Arial, Helvetica, sans-serif",
-        overflowX: "hidden",
-      }}
-    >
+    <main className="case-page">
       <style>{`
         * {
           box-sizing: border-box;
@@ -1573,476 +619,931 @@ export default async function ProjectPage({
           -webkit-tap-highlight-color: transparent;
         }
 
-        .case-link {
-          transition:
-            color .2s ease,
-            transform .2s ease;
+        .case-page {
+          min-height: 100vh;
+          overflow-x: hidden;
+          background: #060608;
+          color: #F0ECE3;
+          font-family: Arial, Helvetica, sans-serif;
         }
 
-        .case-link:hover {
-          color: #7DD3FC !important;
+        .case-nav {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 100;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          min-height: 72px;
+          padding: 0 3rem;
+          border-bottom: 1px solid rgba(240,236,227,.06);
+          background: rgba(6,6,8,.78);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          box-shadow: 0 10px 40px rgba(0,0,0,.08);
+        }
+
+        .case-logo,
+        .case-back {
+          color: #7DD3FC;
+          text-decoration: none;
+          transition: transform .2s ease, color .2s ease;
+        }
+
+        .case-logo {
+          font-size: .86rem;
+          font-weight: 800;
+          letter-spacing: -.03em;
+        }
+
+        .case-nav-title {
+          color: rgba(240,236,227,.24);
+          font-size: .6rem;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+        }
+
+        .case-back {
+          color: rgba(240,236,227,.56);
+          font-size: .65rem;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .case-back:hover,
+        .case-logo:hover {
+          color: #7DD3FC;
         }
 
         .case-back:hover {
           transform: translateX(-4px);
         }
 
-        .list-item {
-          transition:
-            color .2s ease,
-            padding-left .2s ease,
-            border-color .2s ease;
+        .case-label {
+          display: flex;
+          align-items: center;
+          gap: .7rem;
+          margin-bottom: 1.15rem;
+          color: #7DD3FC;
+          font-size: .63rem;
+          letter-spacing: .17em;
+          text-transform: uppercase;
         }
 
-        .list-item:hover {
-          color: #7DD3FC !important;
-          padding-left: .35rem !important;
-          border-color:
-            rgba(125,211,252,0.25) !important;
+        .case-label-line {
+          width: 25px;
+          height: 1px;
+          background: #7DD3FC;
+        }
+
+        .case-label-text {
+          color: rgba(240,236,227,.4);
+        }
+
+        .case-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: .45rem;
+          margin-top: 1.2rem;
+        }
+
+        .case-tags span {
+          padding: .35rem .6rem;
+          border: 1px solid rgba(240,236,227,.12);
+          color: rgba(240,236,227,.42);
+          font-size: .58rem;
+          letter-spacing: .1em;
+          text-transform: uppercase;
+        }
+
+        .case-header {
+          display: grid;
+          grid-template-columns: minmax(0,1.1fr) minmax(280px,.9fr);
+          gap: 5rem;
+          align-items: end;
+        }
+
+        .case-hero {
+          max-width: 1450px;
+          margin: 0 auto;
+          padding: 155px 5vw 55px;
+        }
+
+        .case-number-row {
+          display: flex;
+          align-items: center;
+          gap: .8rem;
+          margin-bottom: 1.35rem;
+          color: #7DD3FC;
+          font-size: .65rem;
+          letter-spacing: .18em;
+          text-transform: uppercase;
+        }
+
+        .case-number-line {
+          width: 35px;
+          height: 1px;
+          background: #7DD3FC;
+        }
+
+        .case-category {
+          color: rgba(240,236,227,.4);
+        }
+
+        .case-title {
+          margin: 0;
+          font-size: clamp(4rem,11vw,10rem);
+          line-height: .82;
+          letter-spacing: -.075em;
+          font-weight: 900;
+        }
+
+        .case-intro {
+          max-width: 470px;
+          margin: 0;
+          color: rgba(240,236,227,.54);
+          font-size: .98rem;
+          line-height: 1.8;
+        }
+
+        .shared-info,
+        .layout-section,
+        .wide-media-section {
+          max-width: 1250px;
+          margin: 0 auto;
+        }
+
+        .wide-media-section {
+          max-width: 1450px;
+          padding: 0 5vw 110px;
+        }
+
+        .shared-info {
+          padding: 10px 5vw 130px;
+        }
+
+        .info-grid {
+          display: grid;
+          gap: 5rem;
+        }
+
+        .overview-grid {
+          grid-template-columns: minmax(0,1fr) minmax(230px,.4fr);
+          padding-bottom: 6rem;
+          border-bottom: 1px solid rgba(240,236,227,.08);
+        }
+
+        .detail-grid {
+          grid-template-columns: repeat(3,minmax(0,1fr));
+          gap: 4rem;
+          padding: 6rem 0 0;
+        }
+
+        .overview-text {
+          max-width: 900px;
+          margin: 0;
+          color: rgba(240,236,227,.8);
+          font-size: clamp(1.5rem,3vw,2.7rem);
+          line-height: 1.18;
+          letter-spacing: -.035em;
+          font-weight: 600;
+        }
+
+        .detail-text {
+          margin: 0;
+          color: rgba(240,236,227,.58);
+          font-size: .9rem;
+          line-height: 1.8;
+        }
+
+        .line-list > div {
+          padding: .72rem 0;
+          border-bottom: 1px solid rgba(240,236,227,.08);
+          color: rgba(240,236,227,.65);
+          font-size: .85rem;
+          transition: color .2s ease, padding-left .2s ease, border-color .2s ease;
+        }
+
+        .line-list > div:hover {
+          padding-left: .35rem;
+          color: #7DD3FC;
+          border-color: rgba(125,211,252,.25);
         }
 
         .main-image {
+          position: relative;
+          width: 100%;
           aspect-ratio: 16 / 9;
+          overflow: hidden;
+          background: #0A0A0D;
+          border: 1px solid rgba(240,236,227,.08);
         }
 
-        .main-image img {
-          transition:
-            transform .8s cubic-bezier(.22,1,.36,1);
+        .main-image-img {
+          object-fit: cover;
+          transition: transform .8s cubic-bezier(.22,1,.36,1);
         }
 
-        .main-image:hover img {
+        .main-image:hover .main-image-img {
           transform: scale(1.025);
         }
 
-        @media (max-width: 900px) {
-          .info-grid {
-            grid-template-columns:
-              1fr !important;
-            gap:
-              3rem !important;
+        .layout-section {
+          padding: 0 5vw 130px;
+        }
+
+        .concrete-grid {
+          display: grid;
+          grid-template-columns: .7fr 1.3fr;
+          gap: 5rem;
+          align-items: start;
+        }
+
+        .sticky-title {
+          position: sticky;
+          top: 110px;
+        }
+
+        .sticky-title h2 {
+          margin: 0;
+          font-size: clamp(2.8rem,6vw,6.5rem);
+          line-height: .88;
+          letter-spacing: -.065em;
+          font-weight: 800;
+        }
+
+        .sticky-title h2 span {
+          color: #7DD3FC;
+        }
+
+        .large-copy {
+          margin: 0;
+          color: rgba(240,236,227,.86);
+          font-size: clamp(1.35rem,2.7vw,2.4rem);
+          line-height: 1.2;
+          letter-spacing: -.03em;
+        }
+
+        .visual-points {
+          margin-top: 4rem;
+          border-top: 1px solid rgba(240,236,227,.08);
+        }
+
+        .visual-point {
+          display: grid;
+          grid-template-columns: 45px 170px 1fr;
+          gap: 1rem;
+          align-items: start;
+          padding: 1.25rem 0;
+          border-bottom: 1px solid rgba(240,236,227,.08);
+        }
+
+        .visual-point > span {
+          color: #7DD3FC;
+          font-size: .65rem;
+        }
+
+        .visual-point strong {
+          font-size: .9rem;
+        }
+
+        .visual-point p {
+          margin: 0;
+          color: rgba(240,236,227,.42);
+          font-size: .82rem;
+          line-height: 1.55;
+        }
+
+        .statement-section {
+          padding: 6rem 5vw;
+          border-top: 1px solid rgba(240,236,227,.08);
+          border-bottom: 1px solid rgba(240,236,227,.08);
+        }
+
+        .statement-section.inline {
+          margin-top: 8rem;
+          padding: 5rem 0;
+        }
+
+        .statement-section p {
+          max-width: 1000px;
+          margin: 0 auto;
+          color: rgba(240,236,227,.94);
+          font-size: clamp(2rem,4.5vw,4.7rem);
+          line-height: 1;
+          letter-spacing: -.055em;
+          font-weight: 700;
+        }
+
+        .statement-section.inline p {
+          margin: 0;
+        }
+
+        .deep-hero {
+          position: relative;
+          min-height: 78vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          border-top: 1px solid rgba(240,236,227,.05);
+          border-bottom: 1px solid rgba(240,236,227,.05);
+        }
+
+        .deep-glow {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at center, rgba(56,189,248,.12), transparent 48%);
+        }
+
+        .deep-circle {
+          position: relative;
+          width: min(1000px,88vw);
+          aspect-ratio: 1 / 1;
+          overflow: hidden;
+          border-radius: 50%;
+          border: 1px solid rgba(125,211,252,.12);
+          box-shadow: 0 0 120px rgba(56,189,248,.08);
+        }
+
+        .deep-image {
+          object-fit: cover;
+          transform: scale(1.08);
+        }
+
+        .deep-ring {
+          position: absolute;
+          border: 1px solid rgba(125,211,252,.16);
+          border-radius: 50%;
+          pointer-events: none;
+        }
+
+        .ring-one { inset: 15%; }
+        .ring-two { inset: 30%; opacity: .8; }
+
+        .deep-hero-meta {
+          position: absolute;
+          left: 5vw;
+          right: 5vw;
+          bottom: 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          color: rgba(240,236,227,.28);
+          font-size: .62rem;
+          letter-spacing: .13em;
+          text-transform: uppercase;
+        }
+
+        .deep-intro {
+          display: grid;
+          grid-template-columns: .45fr 1.55fr;
+          gap: 4rem;
+        }
+
+        .deep-heading {
+          margin: 0 0 3rem;
+          font-size: clamp(2.5rem,6vw,6rem);
+          line-height: .9;
+          letter-spacing: -.06em;
+        }
+
+        .deep-heading span {
+          color: #7DD3FC;
+        }
+
+        .deep-columns {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+        }
+
+        .deep-cards {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+          margin-top: 8rem;
+        }
+
+        .deep-cards article {
+          min-height: 220px;
+          padding: 1.6rem;
+          border: 1px solid rgba(240,236,227,.08);
+          background: rgba(125,211,252,.015);
+        }
+
+        .deep-cards article > span {
+          display: block;
+          margin-bottom: 4rem;
+          color: #7DD3FC;
+          font-size: .63rem;
+        }
+
+        .deep-cards article strong {
+          display: block;
+          font-size: 1.4rem;
+          letter-spacing: -.03em;
+        }
+
+        .deep-cards article p {
+          margin: .7rem 0 0;
+          color: rgba(240,236,227,.4);
+          font-size: .82rem;
+          line-height: 1.6;
+        }
+
+        .glass-hero-section {
+          padding-bottom: 120px;
+        }
+
+        .glass-hero {
+          display: grid;
+          grid-template-columns: .7fr 1.3fr;
+          gap: 1rem;
+          align-items: stretch;
+        }
+
+        .glass-intro-panel {
+          min-height: 650px;
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          border: 1px solid rgba(240,236,227,.08);
+          background: rgba(240,236,227,.012);
+        }
+
+        .glass-intro-panel h2 {
+          margin: 3rem 0 0;
+          font-size: clamp(2.5rem,6vw,6rem);
+          line-height: .9;
+          letter-spacing: -.06em;
+        }
+
+        .glass-intro-panel h2 span {
+          color: #7DD3FC;
+        }
+
+        .glass-intro-panel p {
+          max-width: 300px;
+          margin: 0;
+          color: rgba(240,236,227,.42);
+          font-size: .85rem;
+          line-height: 1.7;
+        }
+
+        .glass-main-image {
+          height: auto;
+          min-height: 650px;
+        }
+
+        .glass-specs {
+          display: grid;
+          grid-template-columns: repeat(4,1fr);
+          border-top: 1px solid rgba(240,236,227,.08);
+          border-bottom: 1px solid rgba(240,236,227,.08);
+        }
+
+        .glass-specs > div {
+          padding: 1.5rem;
+          border-right: 1px solid rgba(240,236,227,.08);
+        }
+
+        .glass-specs > div:last-child {
+          border-right: 0;
+        }
+
+        .glass-specs span,
+        .glass-specs small,
+        .glass-specs strong {
+          display: block;
+        }
+
+        .glass-specs span {
+          margin-bottom: 2rem;
+          color: #7DD3FC;
+          font-size: .6rem;
+        }
+
+        .glass-specs small {
+          color: rgba(240,236,227,.38);
+          font-size: .66rem;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .glass-specs strong {
+          margin-top: .55rem;
+          font-size: .9rem;
+        }
+
+        .glass-copy {
+          display: grid;
+          grid-template-columns: .8fr 1.2fr;
+          gap: 5rem;
+          align-items: end;
+          margin-top: 7rem;
+        }
+
+        .glass-copy > div > p {
+          margin: 0;
+          font-size: clamp(2rem,4vw,4.2rem);
+          line-height: 1;
+          letter-spacing: -.05em;
+          font-weight: 700;
+        }
+
+        .glass-copy > div > p span {
+          color: #7DD3FC;
+        }
+
+        .afterimage-main {
+          aspect-ratio: 16 / 9;
+        }
+
+        .afterimage-head {
+          display: grid;
+          grid-template-columns: minmax(0,1.2fr) minmax(280px,.8fr);
+          gap: 3rem;
+          align-items: end;
+          border-top: 1px solid rgba(240,236,227,.08);
+          padding-top: 5rem;
+        }
+
+        .afterimage-head h2 {
+          margin: 0;
+          font-size: clamp(2.8rem,6vw,6rem);
+          line-height: .88;
+          letter-spacing: -.06em;
+          font-weight: 800;
+        }
+
+        .afterimage-head h2 span {
+          color: #7DD3FC;
+        }
+
+        .afterimage-detail-grid {
+          display: grid;
+          grid-template-columns: 1.35fr .65fr;
+          gap: 1rem;
+          margin-top: 5rem;
+        }
+
+        .afterimage-cards {
+          display: grid;
+          grid-template-rows: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        .afterimage-cards article {
+          min-height: 220px;
+          padding: 1.6rem;
+          border: 1px solid rgba(240,236,227,.08);
+          background: linear-gradient(145deg, rgba(125,211,252,.03), rgba(240,236,227,.01));
+        }
+
+        .afterimage-cards article p {
+          margin: 0;
+          font-size: clamp(1.5rem,2.4vw,2.3rem);
+          line-height: 1;
+          letter-spacing: -.04em;
+          font-weight: 700;
+        }
+
+        .afterimage-cards article p span,
+        .afterimage-mood p span {
+          color: #7DD3FC;
+        }
+
+        .afterimage-mood {
+          display: grid;
+          grid-template-columns: .7fr 1.3fr;
+          gap: 4rem;
+          margin-top: 7rem;
+          padding: 5rem 0;
+          border-top: 1px solid rgba(240,236,227,.08);
+          border-bottom: 1px solid rgba(240,236,227,.08);
+        }
+
+        .afterimage-mood p {
+          margin: 0;
+          font-size: clamp(2rem,4vw,4.3rem);
+          line-height: 1.02;
+          letter-spacing: -.05em;
+          font-weight: 700;
+        }
+
+        @media (max-width: 1000px) {
+          .case-header,
+          .overview-grid,
+          .concrete-grid,
+          .deep-intro,
+          .glass-hero,
+          .glass-copy,
+          .afterimage-head,
+          .afterimage-mood {
+            grid-template-columns: 1fr !important;
           }
 
-          .info-grid.three {
-            grid-template-columns:
-              1fr !important;
+          .detail-grid {
+            grid-template-columns: 1fr !important;
           }
 
-          .concrete-grid {
-            grid-template-columns:
-              1fr !important;
-          }
-
-          .concrete-grid > div:first-child {
-            position:
-              static !important;
-          }
-
-          .deep-intro {
-            grid-template-columns:
-              1fr !important;
+          .sticky-title {
+            position: static;
           }
 
           .deep-cards {
-            grid-template-columns:
-              1fr !important;
+            grid-template-columns: 1fr;
           }
 
-          .glass-hero {
-            grid-template-columns:
-              1fr !important;
-          }
-
-          .glass-main-image {
-            min-height:
-              520px;
-          }
-
-          .glass-specs {
-            grid-template-columns:
-              1fr 1fr !important;
-          }
-
-          .glass-copy {
-            grid-template-columns:
-              1fr !important;
-          }
-
-          .afterimage-grid {
-            grid-template-columns:
-              1fr !important;
-          }
-
-          .afterimage-mood {
-            grid-template-columns:
-              1fr !important;
+          .glass-main-image,
+          .glass-intro-panel {
+            min-height: 520px;
           }
         }
 
         @media (max-width: 700px) {
           .case-nav {
-            padding:
-              1rem 1.25rem !important;
+            min-height: 66px;
+            padding: 0 1.15rem;
           }
 
           .case-nav-title {
-            display:
-              none !important;
+            display: none;
           }
 
           .case-hero {
-            padding:
-              130px 1.25rem 45px !important;
+            padding: 120px 1.25rem 45px;
           }
 
-          .case-body {
-            padding:
-              70px 1.25rem 100px !important;
+          .wide-media-section,
+          .layout-section,
+          .shared-info {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+          }
+
+          .wide-media-section {
+            padding-bottom: 75px;
+          }
+
+          .shared-info {
+            padding-bottom: 95px;
+          }
+
+          .layout-section {
+            padding-bottom: 95px;
           }
 
           .case-title {
-            font-size:
-              clamp(3.2rem, 17vw, 7rem) !important;
+            font-size: clamp(3.1rem,17vw,7rem);
           }
 
-          .main-image {
-            aspect-ratio:
-              4 / 3;
+          .case-header {
+            gap: 2.5rem;
           }
 
-          .afterimage-main,
-          .glass-main-image {
-            aspect-ratio:
-              4 / 3 !important;
+          .overview-text {
+            font-size: clamp(1.35rem,6.2vw,2rem);
           }
 
-          .glass-main-image {
-            min-height:
-              auto !important;
+          .info-grid {
+            gap: 2.6rem;
           }
 
-          .glass-specs {
-            grid-template-columns:
-              1fr !important;
+          .detail-grid {
+            padding-top: 4rem;
           }
 
-          .glass-specs > div {
-            border-right:
-              none !important;
-            border-bottom:
-              1px solid rgba(240,236,227,0.08);
+          .main-image,
+          .afterimage-main {
+            aspect-ratio: 4 / 3;
+          }
+
+          .visual-point {
+            grid-template-columns: 35px 1fr;
+          }
+
+          .visual-point p {
+            grid-column: 2;
+          }
+
+          .deep-hero {
+            min-height: 74svh;
+          }
+
+          .deep-circle {
+            width: 86vw;
+          }
+
+          .deep-hero-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: .45rem;
           }
 
           .deep-columns {
-            grid-template-columns:
-              1fr !important;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
+
+          .glass-intro-panel,
+          .glass-main-image {
+            min-height: auto;
+          }
+
+          .glass-intro-panel {
+            min-height: 460px;
+          }
+
+          .glass-main-image {
+            aspect-ratio: 4 / 3;
+          }
+
+          .glass-specs {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .glass-specs > div {
+            border-right: 1px solid rgba(240,236,227,.08);
+            border-bottom: 1px solid rgba(240,236,227,.08);
+          }
+
+          .glass-specs > div:nth-child(even) {
+            border-right: 0;
+          }
+
+          .glass-specs > div:nth-last-child(-n + 2) {
+            border-bottom: 0;
+          }
+
+          .afterimage-detail-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .afterimage-cards {
+            grid-template-rows: auto;
+            grid-template-columns: 1fr;
+          }
+
+          .statement-section {
+            padding: 4.5rem 1.25rem;
+          }
+
+          .statement-section.inline {
+            margin-top: 5rem;
+            padding: 4.5rem 0;
+          }
+
+          .statement-section p {
+            font-size: clamp(2rem,10vw,4rem);
           }
 
           .case-bottom {
-            flex-direction:
-              column !important;
-            align-items:
-              flex-start !important;
+            grid-template-columns: 1fr !important;
+            align-items: flex-start !important;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .case-title {
+            letter-spacing: -.065em;
+          }
+
+          .case-intro {
+            font-size: .9rem;
+          }
+
+          .glass-specs {
+            grid-template-columns: 1fr;
+          }
+
+          .glass-specs > div,
+          .glass-specs > div:nth-child(even),
+          .glass-specs > div:nth-last-child(-n + 2) {
+            border-right: 0;
+            border-bottom: 1px solid rgba(240,236,227,.08);
+          }
+
+          .glass-specs > div:last-child {
+            border-bottom: 0;
+          }
+
+          .deep-cards article {
+            min-height: 190px;
           }
         }
       `}</style>
 
-      {/* NAVIGATION */}
-
-      <nav
-        className="case-nav"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          display: "flex",
-          justifyContent:
-            "space-between",
-          alignItems: "center",
-          padding:
-            "1.35rem 3rem",
-          borderBottom:
-            "1px solid rgba(240,236,227,0.06)",
-          backdropFilter:
-            "blur(20px)",
-          background:
-            "rgba(6,6,8,0.78)",
-        }}
-      >
-        <a
-          href="/"
-          className="case-link"
-          style={{
-            color: "#7DD3FC",
-            textDecoration:
-              "none",
-            fontSize:
-              "0.86rem",
-            fontWeight: 800,
-            letterSpacing:
-              "-0.03em",
-          }}
-        >
+      <nav className="case-nav" aria-label="Project navigation">
+        <a href="/" className="case-logo">
           MALLORD
         </a>
 
-        <span
-          className="case-nav-title"
-          style={{
-            color:
-              "rgba(240,236,227,0.25)",
-            fontSize:
-              "0.62rem",
-            letterSpacing:
-              "0.16em",
-            textTransform:
-              "uppercase",
-          }}
-        >
+        <span className="case-nav-title">
           Selected Project
         </span>
 
-        <a
-          href="/#projects"
-          className="case-link case-back"
-          style={{
-            color:
-              "rgba(240,236,227,0.58)",
-            textDecoration:
-              "none",
-            fontSize:
-              "0.67rem",
-            letterSpacing:
-              "0.12em",
-            textTransform:
-              "uppercase",
-          }}
-        >
+        <a href="/#projects" className="case-back">
           ← Back to work
         </a>
       </nav>
 
-      {/* HERO */}
-
-      <section
-        className="case-hero"
-        style={{
-          maxWidth: 1450,
-          margin: "0 auto",
-          padding:
-            "160px 5vw 55px",
-        }}
-      >
-        <div
-          className="case-header"
-          style={{
-            display:
-              "grid",
-            gridTemplateColumns:
-              "minmax(0,1.1fr) minmax(280px,0.9fr)",
-            gap:
-              "5rem",
-            alignItems:
-              "end",
-            marginBottom:
-              "3.5rem",
-          }}
-        >
+      <section className="case-hero">
+        <div className="case-header">
           <div>
-            <div
-              style={{
-                display:
-                  "flex",
-                alignItems:
-                  "center",
-                gap:
-                  "0.8rem",
-                marginBottom:
-                  "1.35rem",
-                color:
-                  "#7DD3FC",
-                fontSize:
-                  "0.65rem",
-                letterSpacing:
-                  "0.18em",
-                textTransform:
-                  "uppercase",
-              }}
-            >
-              <span>
-                {project.number}
-              </span>
-
-              <span
-                style={{
-                  width: 35,
-                  height: 1,
-                  background:
-                    "#7DD3FC",
-                }}
-              />
-
-              <span
-                style={{
-                  color:
-                    "rgba(240,236,227,0.4)",
-                }}
-              >
+            <div className="case-number-row">
+              <span>{project.number}</span>
+              <span className="case-number-line" />
+              <span className="case-category">
                 {project.category}
               </span>
             </div>
 
-            <h1
-              className="case-title"
-              style={{
-                margin: 0,
-                fontSize:
-                  "clamp(4rem, 11vw, 10rem)",
-                lineHeight:
-                  0.82,
-                letterSpacing:
-                  "-0.075em",
-                fontWeight:
-                  900,
-              }}
-            >
-              {project.title}
-            </h1>
+            <h1 className="case-title">{project.title}</h1>
           </div>
 
           <div>
-            <p
-              style={{
-                maxWidth:
-                  470,
-                margin: 0,
-                color:
-                  "rgba(240,236,227,0.54)",
-                fontSize:
-                  "0.98rem",
-                lineHeight:
-                  1.8,
-              }}
-            >
-              {project.intro}
-            </p>
-
-            <Tags
-              items={
-                project.tags
-              }
-            />
+            <p className="case-intro">{project.intro}</p>
+            <Tags items={project.tags} />
           </div>
         </div>
       </section>
 
-      {/* SHARED INFO */}
+      <SharedInfo project={project} />
 
-      <SharedInfo
-        project={
-          project
-        }
-      />
-
-      {/* UNIQUE LAYOUT */}
-
-      {project.layout ===
-        "afterimage" && (
-        <AfterimageLayout
-          project={
-            project
-          }
-        />
+      {project.layout === "afterimage" && (
+        <AfterimageLayout project={project} />
       )}
 
-      {project.layout ===
-        "concrete" && (
-        <ConcreteLayout
-          project={
-            project
-          }
-        />
+      {project.layout === "concrete" && (
+        <ConcreteLayout project={project} />
       )}
 
-      {project.layout ===
-        "deep-blue" && (
-        <DeepBlueLayout
-          project={
-            project
-          }
-        />
+      {project.layout === "deep-blue" && (
+        <DeepBlueLayout project={project} />
       )}
 
-      {project.layout ===
-        "glass-object" && (
-        <GlassObjectLayout
-          project={
-            project
-          }
-        />
+      {project.layout === "glass-object" && (
+        <GlassObjectLayout project={project} />
       )}
 
-      {/* FOOTER CTA */}
-
-      <section
-        style={{
-          maxWidth: 1250,
-          margin: "0 auto",
-          padding:
-            "0 5vw 120px",
-        }}
-      >
+      <section className="layout-section" style={{ paddingBottom: "120px" }}>
         <div
           className="case-bottom"
           style={{
-            paddingTop:
-              "1.5rem",
-            borderTop:
-              "1px solid rgba(240,236,227,0.08)",
-            display:
-              "flex",
-            justifyContent:
-              "space-between",
-            alignItems:
-              "center",
-            gap:
-              "2rem",
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
+            alignItems: "center",
+            gap: "2rem",
+            paddingTop: "1.5rem",
+            borderTop: "1px solid rgba(240,236,227,.08)",
           }}
         >
+          {projectSlugs.indexOf(project.layout) > 0 ? (
+            <a
+              href={`/projects/${projectSlugs[projectSlugs.indexOf(project.layout) - 1]}`}
+              className="case-back"
+            >
+              ← Previous
+            </a>
+          ) : (
+            <span />
+          )}
+
           <span
             style={{
-              color:
-                "rgba(240,236,227,0.22)",
-              fontSize:
-                "0.64rem",
-              letterSpacing:
-                "0.11em",
-              textTransform:
-                "uppercase",
+              color: "rgba(240,236,227,.2)",
+              fontSize: ".61rem",
+              letterSpacing: ".11em",
+              textTransform: "uppercase",
+              textAlign: "center",
             }}
           >
             Self-initiated concept
           </span>
 
-          <a
-            href="/#contact"
-            className="case-link"
-            style={{
-              color:
-                "#7DD3FC",
-              textDecoration:
-                "none",
-              fontSize:
-                "0.67rem",
-              letterSpacing:
-                "0.13em",
-              textTransform:
-                "uppercase",
-            }}
-          >
-            Start a project →
-          </a>
+          {projectSlugs.indexOf(project.layout) < projectSlugs.length - 1 ? (
+            <a
+              href={`/projects/${projectSlugs[projectSlugs.indexOf(project.layout) + 1]}`}
+              className="case-back"
+              style={{ textAlign: "right" }}
+            >
+              Next project →
+            </a>
+          ) : (
+            <a
+              href="/#contact"
+              className="case-back"
+              style={{ textAlign: "right" }}
+            >
+              Start a project →
+            </a>
+          )}
         </div>
       </section>
     </main>
