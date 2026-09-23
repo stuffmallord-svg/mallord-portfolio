@@ -1,50 +1,152 @@
-# MALLORD — Creative Portfolio
+# MALLORD — Creative Studio
 
-A personal creative portfolio focused on digital experiences, AI content, short-form video, and modern web design.
+Independent creative practice focused on **digital experiences, AI-assisted visuals, short-form content and modern web design**.
 
-## Overview
+**Live:** https://mallord-portfolio.vercel.app/
 
-MALLORD is a creative portfolio built to showcase selected digital projects across:
+---
 
-* Web Design
-* AI Visuals
-* Short-form Content
-* Video Editing
-* Creative Direction
+## About
 
-The site combines a minimal dark interface with subtle motion, interactive elements, and a strong visual focus.
+MALLORD is a personal creative studio and portfolio built around the idea of turning rough concepts into clear visual experiences.
 
-## Built With
+The project combines:
 
-* Next.js
-* React
+* Creative direction
+* AI-assisted visual development
+* Short-form content
+* Video editing
+* Web design
+* Front-end development
+
+The visual system is intentionally minimal, dark and typography-led, with motion, interaction and editorial-style layouts.
+
+---
+
+## Selected Work
+
+### AFTERIMAGE
+
+Cinematic visual direction exploring motion, light and digital identity.
+
+**Focus:** Art Direction / Motion / Visual
+
+`/projects/afterimage`
+
+### CONCRETE
+
+Architectural visual study built around geometry, shadow and atmosphere.
+
+**Focus:** Architecture / Editorial / Visual
+
+`/projects/concrete`
+
+### DEEP BLUE
+
+Experimental digital concept exploring AI-assisted imagery, light and abstract forms.
+
+**Focus:** AI / Digital Art / Experiment
+
+`/projects/deep-blue`
+
+### GLASS OBJECT
+
+Minimal product visual experiment focused on transparency, material and futuristic presentation.
+
+**Focus:** 3D / Product / Art Direction
+
+`/projects/glass-object`
+
+> All projects are self-initiated concepts created for portfolio and creative exploration.
+
+---
+
+## Services
+
+**Short-form Content**
+TikTok, Reels and Shorts with hooks, pacing, typography and platform-first editing.
+
+**AI Visuals**
+Generative visual concepts, campaign assets and experimental imagery.
+
+**Web Design**
+Landing pages, portfolios and digital experiences built around strong visual direction.
+
+**Video Editing**
+Cuts, sound, transitions, typography and visual rhythm for social content.
+
+**Creative Direction**
+From rough references and ideas to a coherent visual system and final output.
+
+**Next.js / React**
+Responsive front-end experiences with motion, interaction and polished UI details.
+
+---
+
+## Tech Stack
+
+* Next.js 16
+* React 19
 * TypeScript
 * Framer Motion
-* Tailwind CSS
+* Next/Image
+* CSS
 * Vercel
+
+Additional creative tools include:
+
+* Figma
+* Photoshop
+* CapCut
+* AI creative tools
+
+---
 
 ## Features
 
-* Responsive layout
+* Responsive desktop and mobile layouts
+* Mobile navigation
 * Smooth scrolling
 * Motion-based interactions
-* Animated project sections
-* Interactive navigation
-* Contact links
-* Dark visual system
-* Optimized for portfolio presentation
+* Animated hero and marquee
+* Custom cursor effect on desktop
+* Responsive project layouts
+* Dedicated case-study pages
+* Optimized project images
+* Dynamic route generation for projects
+* SEO metadata
+* Open Graph social preview
+* Custom favicon
+* Accessible contact links
+* Copy-email interaction
+* Reduced-motion support
 
-## Live Website
+---
 
-https://mallord-portfolio.vercel.app/
+## Project Structure
 
-## Contact
+```text
+src/
+└── app/
+    ├── layout.tsx
+    ├── page.tsx
+    ├── icon.svg
+    ├── opengraph-image.tsx
+    └── projects/
+        └── [slug]/
+            └── page.tsx
 
-Telegram: https://t.me/shaahdm
+public/
+└── projects/
+    ├── afterimage.jpg
+    ├── concrete.jpg
+    ├── deep-blue.jpg
+    └── glass-object.jpg
+```
 
-Email: [stuffmallord@gmail.com](mailto:stuffmallord@gmail.com)
+---
 
-## Development
+## Local Development
 
 Install dependencies:
 
@@ -64,11 +166,50 @@ Open:
 http://localhost:3000
 ```
 
+---
+
+## Production Build
+
+Create a production build locally:
+
+```bash
+npm run build
+```
+
+Run the production server:
+
+```bash
+npm start
+```
+
+---
+
 ## Deployment
 
-The project is deployed with Vercel and connected to the `main` branch.
+The project is deployed on Vercel and connected to the `main` branch.
 
-Every new push to `main` triggers a new production deployment.
+Pushing to `main` creates a new deployment.
+
+```bash
+git add .
+git commit -m "Update portfolio"
+git push
+```
+
+---
+
+## Contact
+
+**Email:** [stuffmallord@gmail.com](mailto:stuffmallord@gmail.com)
+**Telegram:** https://t.me/shaahdm
+
+---
+
+## Status
+
+MALLORD is an evolving personal creative practice.
+
+The portfolio is continuously updated with new visual experiments, digital concepts and creative work.
 
 ---
 
